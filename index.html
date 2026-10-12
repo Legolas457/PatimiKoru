@@ -1,1019 +1,480 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PatimiKoru - Online Topluluk</title>
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatimiKoru - Sokak Hayvanları Destek Platformu</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --primary-gradient: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            --secondary-gradient: linear-gradient(135deg, #00B894 0%, #00CEC9 100%);
+            --bg-color: #F4F7FB;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+            --accent: #00B894;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
+        }
 
-  <style>
-    :root {
-      --primary: #FF6B6B;
-      --primary-hover: #EE5253;
-      --secondary: #4ECDC4;
-      --accent: #FFE66D;
-      --bg: #F7F9FC;
-      --card-bg: #FFFFFF;
-      --text: #2D3436;
-      --text-light: #636E72;
-      --shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
-    .app-container { width: 100%; max-width: 480px; height: 95vh; max-height: 850px; background: var(--card-bg); border-radius: 30px; box-shadow: var(--shadow); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-    .header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #F0F0F0; background: #fff; }
-    .header-title { font-weight: 800; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-    .user-badge-header { display: flex; align-items: center; gap: 6px; background: #FFF0F0; padding: 5px 10px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; color: var(--primary); }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
 
-    .content-area { flex: 1; overflow-y: auto; padding: 16px; }
-    .bottom-nav { height: 68px; background: #FFFFFF; border-top: 1px solid #F0F0F0; display: flex; justify-content: space-around; align-items: center; padding: 0 2px; flex-shrink: 0; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-light); font-size: 0.48rem; font-weight: 600; cursor: pointer; background: none; border: none; flex: 1; position: relative; }
-    .nav-item i { font-size: 0.85rem; }
-    .nav-item.active { color: var(--primary); transform: translateY(-2px); }
+        /* Şık Modern Üst Bar */
+        header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-    .screen { display: none; }
-    .screen.active { display: block; }
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.5px;
+        }
 
-    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-    .form-group label { font-weight: 600; font-size: 0.85rem; color: var(--text-light); }
-    .input-field { padding: 10px 14px; border: 2px solid #EDF2F7; border-radius: 12px; font-size: 0.85rem; outline: none; width: 100%; background: #fff; }
-    .input-field:focus { border-color: var(--primary); }
-    .btn { padding: 10px 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; justify-content: center; align-items: center; gap: 6px; }
-    .btn:hover { background: var(--primary-hover); }
-    .btn-secondary { background: var(--secondary); }
-    .btn-sm { padding: 6px 10px; font-size: 0.75rem; border-radius: 8px; }
-    .btn-danger { background: #E74C3C; }
-    .btn-admin { background: #2D3436; color: white; }
-    .btn-warning { background: #F1C40F; color: #2D3436; }
-    .btn-info { background: #3498DB; color: white; }
+        .points-badge {
+            background: linear-gradient(135deg, #FFF3CD 0%, #FFE8A1 100%);
+            color: #856404;
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
 
-    .auth-welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; gap: 12px; }
-    .auth-welcome i { font-size: 4rem; color: var(--primary); margin-bottom: 5px; }
-    .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 5px; }
-    .avatar-option { width: 45px; height: 45px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; object-fit: cover; background: #EDF2F7; }
-    .avatar-option.selected { border-color: var(--primary); transform: scale(1.1); }
+        .container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
 
-    .task-card { background: #F8FAF9; border: 1px solid #E2E8F0; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-    .task-info { display: flex; justify-content: space-between; align-items: center; }
-    .task-title { font-weight: 700; font-size: 0.85rem; }
-    .task-reward { font-size: 0.75rem; font-weight: 800; color: var(--primary); }
+        /* Modern Kart Tasarımı */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+        }
 
-    .feed-card { background: white; border-radius: 16px; border: 1px solid #EDF2F7; padding: 12px; margin-bottom: 12px; }
-    .feed-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .feed-avatar { width: 35px; height: 35px; border-radius: 50%; background: #EDF2F7; object-fit: cover; }
-    .feed-img { width: 100%; border-radius: 10px; margin-top: 8px; max-height: 180px; object-fit: cover; }
+        h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.3px;
+        }
 
-    .store-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
-    .store-item { background: #F8FAF9; border: 1px solid #E2E8F0; border-radius: 14px; padding: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+        /* Butonlar */
+        .btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
 
-    .sos-card { background: #FFF5F5; border: 1px solid #FEB2B2; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
-    .game-box { background: #2D3436; border-radius: 16px; padding: 14px; color: white; text-align: center; margin-top: 10px; }
-    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
-    .memory-card { background: var(--primary); height: 38px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; cursor: pointer; user-select: none; }
-    .memory-card.flipped { background: white; }
+        .btn:active {
+            transform: scale(0.98);
+        }
 
-    .friend-card { background: #F8FAF9; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .chat-container { display: flex; flex-direction: column; height: 100%; }
-    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 10px 0; max-height: 380px; }
-    .chat-msg { max-width: 85%; padding: 10px 12px; border-radius: 12px; font-size: 0.85rem; word-break: break-word; }
-    .chat-msg.sent { background: var(--primary); color: white; align-self: flex-end; }
-    .chat-msg.received { background: #EDF2F7; color: var(--text); align-self: flex-start; }
-    .coop-card { background: #FFFBEB; border: 2px solid #F6E05E; border-radius: 12px; padding: 10px; margin-top: 4px; color: #744210; font-size: 0.8rem; }
-    .report-card { background: #FFF5F5; border: 1px solid #FEB2B2; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
-  </style>
+        .btn-secondary {
+            background: var(--secondary-gradient);
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.25);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            outline: none;
+            font-size: 14px;
+            background: #FAFCFF;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+        }
+
+        /* Alt Navigasyon (Floating Dock Tarzı) */
+        nav {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 560px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 6px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            gap: 4px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(255, 107, 107, 0.08);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sekme Butonları (İstekler / Arkadaşlar) */
+        .sub-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            background: #F1F5F9;
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .sub-tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sub-tab-btn.active {
+            background: #FFFFFF;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+    </style>
 </head>
 <body>
 
-<div class="app-container">
-  <div class="header">
-    <div class="header-title"><i class="fa-solid fa-paw"></i> PatimiKoru</div>
-    <div class="user-badge-header" id="userPatiBadge" style="display: none;">
-      <i class="fa-solid fa-coins"></i> <span id="headerPoints">0</span> Pati
-    </div>
-  </div>
-
-  <div class="content-area">
-    <!-- AUTH WELCOME -->
-    <div id="screenAuthWelcome" class="screen active">
-      <div class="auth-welcome">
-        <i class="fa-solid fa-shield-cat"></i>
-        <h2 style="font-weight: 800;">PatimiKoru'ya Hoş Geldin!</h2>
-        <p style="color: var(--text-light); font-size: 0.85rem; max-width: 280px;">Sokaktaki ve barınaktaki dostlarımıza destek olalım.</p>
-        <button class="btn" style="width: 100%;" onclick="showScreen('screenAuthRegister')">Hesap Oluştur</button>
-        <button class="btn btn-secondary" style="width: 100%;" onclick="showScreen('screenAuthLogin')">Giriş Yap</button>
-        <button class="btn btn-admin" style="width: 100%;" onclick="showScreen('screenAuthAdminLogin')"><i class="fa-solid fa-user-shield"></i> Admin Girişi</button>
-      </div>
-    </div>
-
-    <!-- REGISTER -->
-    <div id="screenAuthRegister" class="screen">
-      <button class="btn btn-sm btn-secondary" style="margin-bottom: 12px;" onclick="showScreen('screenAuthWelcome')"><i class="fa-solid fa-arrow-left"></i> Geri</button>
-      <h3 style="font-weight: 800; margin-bottom: 10px;">Hesap Oluştur 🐾</h3>
-      <div class="form-group"><label>Kullanıcı Adı</label><input type="text" id="regUsername" class="input-field" placeholder="Kullanıcı adı..."></div>
-      <div class="form-group"><label>Şifre</label><input type="password" id="regPassword" class="input-field" placeholder="Şifre..."></div>
-      <div class="form-group"><label>Ad Soyad</label><input type="text" id="regFullName" class="input-field" placeholder="Ad Soyad..."></div>
-      <div class="form-group"><label>Avatar Seç</label><div class="avatar-grid" id="registerAvatarGrid"></div></div>
-      <button class="btn" style="width:100%; margin-top:5px;" onclick="handleRegister()">Kayıt Ol ve Başla</button>
-    </div>
-
-    <!-- LOGIN -->
-    <div id="screenAuthLogin" class="screen">
-      <button class="btn btn-sm btn-secondary" style="margin-bottom: 12px;" onclick="showScreen('screenAuthWelcome')"><i class="fa-solid fa-arrow-left"></i> Geri</button>
-      <h3 style="font-weight: 800; margin-bottom: 10px;">Giriş Yap 🔑</h3>
-      <div class="form-group"><label>Kullanıcı Adı</label><input type="text" id="loginUsername" class="input-field" placeholder="Kullanıcı adı..."></div>
-      <div class="form-group"><label>Şifre</label><input type="password" id="loginPassword" class="input-field" placeholder="Şifre..."></div>
-      <button class="btn" style="width:100%; margin-top:5px;" onclick="handleLogin()">Giriş Yap</button>
-    </div>
-
-    <!-- ADMIN LOGIN -->
-    <div id="screenAuthAdminLogin" class="screen">
-      <button class="btn btn-sm btn-secondary" style="margin-bottom: 12px;" onclick="showScreen('screenAuthWelcome')"><i class="fa-solid fa-arrow-left"></i> Geri</button>
-      <h3 style="font-weight: 800; margin-bottom: 5px; color: var(--primary);"><i class="fa-solid fa-user-shield"></i> Admin Girişi 🛡</h3>
-      <div class="form-group"><label>Admin Kullanıcı Adı</label><input type="text" id="adminLoginUsername" class="input-field" placeholder="Admin adı..."></div>
-      <div class="form-group"><label>Admin Şifre</label><input type="password" id="adminLoginPassword" class="input-field" placeholder="Admin şifre..."></div>
-      <button class="btn btn-admin" style="width:100%; margin-top:5px;" onclick="handleAdminLogin()">Yönetici Olarak Giriş Yap</button>
-    </div>
-
-    <!-- ADMIN REPORTS -->
-    <div id="screenAdminReports" class="screen">
-      <button class="btn btn-sm btn-secondary" style="margin-bottom: 12px;" onclick="switchTab('screenHome')"><i class="fa-solid fa-arrow-left"></i> Akışa Dön</button>
-      <h3 style="font-weight: 800; margin-bottom: 10px; color: var(--primary);">🚨 Gelen Şikayetler & Moderasyon</h3>
-      <div id="reportsList"></div>
-    </div>
-
-    <!-- ADMIN FEEDBACKS -->
-    <div id="screenAdminFeedbacks" class="screen">
-      <button class="btn btn-sm btn-secondary" style="margin-bottom: 12px;" onclick="switchTab('screenHome')"><i class="fa-solid fa-arrow-left"></i> Akışa Dön</button>
-      <h3 style="font-weight: 800; margin-bottom: 10px; color: #3498DB;">💬 Gelen Geri Bildirimler</h3>
-      <div id="feedbacksList"></div>
-    </div>
-
-    <!-- DASHBOARD (GÖREVLER) -->
-    <div id="screenDashboard" class="screen">
-      <h3 style="font-weight: 800; margin-bottom: 10px;">Günlük Görevler 🏠</h3>
-      <div style="background: #FFF3CD; border: 1px solid #FFEEBA; border-radius: 12px; padding: 10px; margin-bottom: 10px; font-size: 0.75rem; color: #856404; line-height: 1.4;">
-        ⚠️ <b>Önemli Bilgilendirme:</b> Bu uygulama insanları iyiliğe ve hayvan sevgisine yönelten bir platformdur. Lütfen yalandan veya sahte fotoğraf yüklemeyin. Her gün saat 12:00'de görevler yenilenir!
-      </div>
-      <div style="background: linear-gradient(135deg, #4ECDC4, #2EE59D); border-radius: 14px; padding: 12px; color: white; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <div>
-          <div style="font-weight: 800; font-size: 0.85rem;"><i class="fa-solid fa-comment-dots"></i> Görüşlerin Değerli!</div>
-          <div style="font-size: 0.7rem; opacity: 0.9;">Öneri veya şikayetlerini ilet.</div>
+    <header>
+        <div class="logo">
+            🐾 PatimiKoru
         </div>
-        <button class="btn btn-sm" style="background: white; color: var(--text); font-weight: 800;" onclick="openFeedbackModal()">Bildir</button>
-      </div>
-      <div id="taskList"></div>
-    </div>
-
-    <!-- SOS / ACİL DURUM -->
-    <div id="screenSOS" class="screen">
-      <h3 style="font-weight: 800; margin-bottom: 4px;">Acil SOS & Destek Hatları 🚨</h3>
-      <p style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 10px;">Resmi kurtarma hatları ve acil durum araçları.</p>
-      
-      <div class="sos-card">
-        <div style="font-weight: 800; font-size: 0.85rem; color: var(--primary);"><i class="fa-solid fa-building-shield"></i> Diyarbakır Hayvanları Koruma Hattı</div>
-        <div style="font-size: 0.75rem; color: var(--text-light); margin: 4px 0;">Sokak hayvanları ihbar ve bildirim hattı.</div>
-        <button class="btn btn-sm btn-secondary" style="margin-top:4px;" onclick="copyToClipboard('04122295050')"><i class="fa-solid fa-copy"></i> Numarayı Kopyala (0412 229 50 50)</button>
-      </div>
-
-      <div class="sos-card">
-        <div style="font-weight: 800; font-size: 0.85rem; color: #E74C3C;"><i class="fa-solid fa-triangle-exclamation"></i> 112 Acil Çağrı Merkezi</div>
-        <div style="font-size: 0.75rem; color: var(--text-light); margin: 4px 0;">Ağır yaralı, kaza geçirmiş veya tehlikedeki hayvanlar için.</div>
-        <button class="btn btn-sm btn-danger" style="margin-top:4px;" onclick="copyToClipboard('112')"><i class="fa-solid fa-copy"></i> Numarayı Kopyala (112)</button>
-      </div>
-
-      <div class="sos-card" style="border-color: #3498DB; background: #EBF5FB;">
-        <div style="font-weight: 800; font-size: 0.85rem; color: #3498DB;"><i class="fa-solid fa-map-location-dot"></i> En Yakın Veteriner Kliniği</div>
-        <div style="font-size: 0.75rem; color: var(--text-light); margin: 4px 0;">Bulunduğun konuma en yakın veterineri Google Haritalar'da bul.</div>
-        <button class="btn btn-sm btn-info" style="margin-top:4px;" onclick="openNearestVetMap()"><i class="fa-solid fa-location-arrow"></i> Haritalarda Aç</button>
-      </div>
-
-      <div class="sos-card" style="border-color: #F1C40F; background: #FEF9E7;">
-        <div style="font-weight: 800; font-size: 0.85rem; color: #D4AC0D;"><i class="fa-solid fa-paw"></i> PatimiKoru Gönüllü İhbar Hattı</div>
-        <div style="font-size: 0.75rem; color: var(--text-light); margin: 4px 0;">Çok yakında hizmetinizde olacak! 🚀</div>
-      </div>
-    </div>
-
-    <!-- FEED -->
-    <div id="screenHome" class="screen">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <h3 style="font-weight: 800;">Serbest Paylaşımlar 📸</h3>
-        <div id="adminActionButtons" style="display: flex; gap: 4px;"></div>
-      </div>
-      <div style="margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;">
-        <input type="text" id="feedInput" class="input-field" placeholder="Bir şeyler yaz...">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <input type="file" id="feedImageFile" accept="image/*" style="font-size: 0.70rem; max-width: 60%;">
-          <button class="btn btn-sm" onclick="addPost()" style="flex-shrink: 0; margin-left: 4px;">Paylaş</button>
+        <div class="points-badge" id="userPointsDisplay">
+            🪙 0 Pati
         </div>
-      </div>
-      <div id="feedList"></div>
-    </div>
+    </header>
 
-    <!-- STORE (MAĞAZA) -->
-    <div id="screenStore" class="screen">
-      <h3 style="font-weight: 800; margin-bottom: 6px;">Pati Mağazası 🏅</h3>
-      <p style="color: var(--text-light); font-size: 0.8rem; margin-bottom: 10px;">Puanlarınla rozet ve özel avatarlar satın al!</p>
-      <div id="storeGridContainer"></div>
-    </div>
-
-    <!-- MINI GAMES -->
-    <div id="screenGame" class="screen">
-      <h3 style="font-weight: 800; margin-bottom: 4px;">Pati Oyun Salonu 🎮</h3>
-      <div class="game-box">
-        <h4 style="font-size:0.9rem; color:var(--secondary);">Hafıza Oyunu (Günde 1 Kez)</h4>
-        <p style="font-size:0.75rem; margin:4px 0;">45 saniyede eşleştir, 100 puanı kap!</p>
-        <button class="btn btn-sm btn-secondary" id="btnStartGame" onclick="startMemoryGame()">Oyunu Başlat</button>
-        <div id="gameActiveArea" style="display:none; margin-top:8px;">
-          <div style="font-size:0.75rem; margin-bottom:4px;">Eşleşen: <span id="memoryMatches">0</span>/10</div>
-          <div class="memory-grid" id="memoryGridContainer"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FRIENDS -->
-    <div id="screenFriends" class="screen">
-      <h3 style="font-weight: 800; margin-bottom: 6px;">Arkadaşlar 👥</h3>
-      <div style="margin-bottom: 10px; display: flex; gap: 6px;">
-        <input type="text" id="searchUserField" class="input-field" placeholder="Kullanıcı adı..." style="font-size: 0.8rem; padding: 8px 10px;">
-        <button class="btn btn-sm" onclick="sendFriendRequest()"><i class="fa-solid fa-user-plus"></i></button>
-      </div>
-      <div id="friendRequestsContainer" style="margin-bottom: 8px;"></div>
-      <div id="friendListContainer"></div>
-    </div>
-
-    <!-- CHAT -->
-    <div id="screenChat" class="screen">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <button class="btn btn-sm btn-secondary" onclick="switchTab('screenFriends')"><i class="fa-solid fa-arrow-left"></i> Geri</button>
-        <h4 id="chatHeaderUsername" style="font-weight: 800; font-size: 0.9rem;">@Kullanıcı</h4>
-      </div>
-      <div class="chat-container">
-        <div class="chat-messages" id="chatMessagesList"></div>
-        <div style="display: flex; gap: 4px; margin-top: 6px;">
-          <input type="text" id="chatInput" class="input-field" placeholder="Mesaj yaz..." style="font-size: 0.8rem; padding: 8px 10px;">
-          <button class="btn btn-sm btn-secondary" onclick="openCoopModal()" title="Ortak Görev"><i class="fa-solid fa-flag"></i></button>
-          <button class="btn btn-sm btn-danger" onclick="clearChatHistory()" title="Sohbeti Temizle"><i class="fa-solid fa-trash"></i></button>
-          <button class="btn btn-sm" onclick="sendPrivateMessage()"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
-      </div>
-    </div>
-
-    <!-- PROFILE -->
-    <div id="screenProfile" class="screen">
-      <h3 style="font-weight: 800; margin-bottom: 10px;">Profilim 👤</h3>
-      <div style="background:#F8FAF9; border:1px solid #E2E8F0; border-radius:16px; padding:15px; text-align:center;">
-        <img id="profileAvatar" src="" style="width:70px; height:70px; border-radius:50%; border:3px solid var(--primary); margin-bottom:8px; object-fit:cover;">
-        <h4 id="profileFullName" style="font-weight: 800;">Ad Soyad</h4>
-        <p id="profileUsername" style="color: var(--text-light); font-size: 0.8rem; margin-bottom: 8px;">@kullaniciadi</p>
-        <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 12px;">Puan: <span id="profilePoints" style="color:var(--primary);">0</span> Pati</div>
-        
-        <div style="text-align:left; background:white; padding:10px; border-radius:12px; border:1px solid #EDF2F7; margin-bottom:12px;">
-          <div style="font-weight:800; font-size:0.8rem; color:var(--primary); margin-bottom:6px;"><i class="fa-solid fa-box-archive"></i> Envanterim (Rozet & Avatarlar)</div>
-          <div id="userInventoryContainer" style="display:flex; flex-wrap:wrap; gap:6px; min-height:40px; align-items:center;"></div>
-        </div>
-
-        <button class="btn btn-sm btn-danger" style="width:100%;" onclick="deleteMyAccount()">Hesabımı Sil</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- NAVIGATION -->
-  <div class="bottom-nav" id="bottomNav" style="display: none;">
-    <button class="nav-item active" onclick="switchTab('screenDashboard', this)"><i class="fa-solid fa-house"></i> Görevler</button>
-    <button class="nav-item" onclick="switchTab('screenSOS', this)"><i class="fa-solid fa-triangle-exclamation"></i> SOS</button>
-    <button class="nav-item" onclick="switchTab('screenHome', this)"><i class="fa-solid fa-rss"></i> Akış</button>
-    <button class="nav-item" onclick="switchTab('screenStore', this)"><i class="fa-solid fa-store"></i> Mağaza</button>
-    <button class="nav-item" onclick="switchTab('screenGame', this)"><i class="fa-solid fa-gamepad"></i> Oyun</button>
-    <button class="nav-item" onclick="switchTab('screenFriends', this)"><i class="fa-solid fa-user-group"></i> Arkadaşlar</button>
-    <button class="nav-item" onclick="switchTab('screenProfile', this)"><i class="fa-solid fa-user"></i> Profil</button>
-  </div>
-</div>
-
-<script>
-  let db = null;
-  try {
-    const firebaseConfig = {
-      apiKey: "AIzaSyBRBSnvsY6X4E6WNRU0f-S",
-      authDomain: "patimikoru.firebaseapp.com",
-      projectId: "patimikoru",
-      storageBucket: "patimikoru.firebasestorage.app",
-      messagingSenderId: "143631667870",
-      appId: "1:143631667870:web:c1ac49c21bc32f6168218f"
-    };
-    if(typeof firebase !== 'undefined') {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.firestore();
-    }
-  } catch(e) {}
-
-  let currentUser = null;
-  let selectedAvatarUrl = "";
-  let currentChatFriend = "";
-  let chatUnsubscribe = null;
-
-  const adminAccounts = {
-    "ART_Rojhat": "Adminrojhat_21",
-    "ART_Talha": "Admintalha_21",
-    "ART_Arjin": "Adminarjin_21"
-  };
-
-  const adminAvatarsMap = {
-    "ART_Rojhat": "https://api.dicebear.com/7.x/bottts/svg?seed=RoboRojhatCop&backgroundColor=1A202C&eyes=shade&mouth=smile",
-    "ART_Talha": "https://api.dicebear.com/7.x/bottts/svg?seed=RoboTalhaAgent&backgroundColor=1A202C&eyes=shade&mouth=diagram",
-    "ART_Arjin": "https://api.dicebear.com/7.x/bottts/svg?seed=RoboArjinGuard&backgroundColor=1A202C&eyes=shade&mouth=square"
-  };
-  
-  const animalAvatars = [
-    "https://api.dicebear.com/7.x/bottts/svg?seed=Cat",
-    "https://api.dicebear.com/7.x/bottts/svg?seed=Dog",
-    "https://api.dicebear.com/7.x/bottts/svg?seed=Bird",
-    "https://api.dicebear.com/7.x/bottts/svg?seed=Bunny"
-  ];
-
-  // Günlere göre değişen görev setleri (Toplam 4 görev havuzu)
-  const taskPools = {
-    1: [
-      { id: 1, title: "Sokak Kedilerini Sev ve Besle", reward: 15 },
-      { id: 2, title: "Yaralı veya Susamış Kuş İçin Su Kabı Bırak", reward: 10 },
-      { id: 3, title: "Barınaktaki Dostlar İçin Bilgilendirici Paylaşım Yap", reward: 20 },
-      { id: 4, title: "Mahalledeki Sokak Kedilerini Kontrol Et", reward: 15 }
-    ],
-    2: [
-      { id: 1, title: "Bir Kediye Kuru Mama ve Süt Ver", reward: 15 },
-      { id: 2, title: "Kuşlar İçin Ağaca Ekmek veya Yem As", reward: 10 },
-      { id: 3, title: "Sokak Hayvanları İçin Karton Kutu Ev Yap", reward: 25 },
-      { id: 4, title: "Parktaki Kedilerin Sağlık Durumunu Gözlemle", reward: 15 }
-    ],
-    3: [
-      { id: 1, title: "Yaralı Gördüğün Bir Kediyi/Köpeği Veterine Bildir", reward: 25 },
-      { id: 2, title: "Sokak Köpeklerine Güvenli Bir Yerden Mama Ver", reward: 15 },
-      { id: 3, title: "Kuş Yuvası İçin Uygun Bir Alan Hazırla", reward: 15 },
-      { id: 4, title: "Çevredeki Hayvanseverlerle Yardımlaşma Konuş", reward: 10 }
-    ]
-  };
-
-  const storeBadges = [
-    { id: 'b1', name: "Minik Pati Rozeti", price: 50, icon: "🐾", type: "badge" },
-    { id: 'b2', name: "Sokak Koruyucusu", price: 100, icon: "🛡️", type: "badge" },
-    { id: 'b3', name: "Altın Kemik Ödülü", price: 150, icon: "🦴", type: "badge" },
-    { id: 'b4', name: "Süper Gönüllü", price: 200, icon: "⭐", type: "badge" },
-    { id: 'b5', name: "Kedi Dostu", price: 250, icon: "🐱", type: "badge" },
-    { id: 'b6', name: "Köpek Dostu", price: 250, icon: "🐶", type: "badge" },
-    { id: 'b7', name: "Doğa Kahramanı", price: 300, icon: "🌿", type: "badge" },
-    { id: 'b8', name: "Kalpli Hayvansever", price: 350, icon: "❤️", type: "badge" },
-    { id: 'b9', name: "Kral Tacı Rozeti", price: 450, icon: "👑", type: "badge" },
-    { id: 'b10', name: "Elmas Hayvan Dostu", price: 600, icon: "💎", type: "badge" }
-  ];
-
-  const storeAvatars = [
-    { id: 'a1', name: "Aslan Avatarı", price: 80, icon: "🦁", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Lion" },
-    { id: 'a2', name: "Panda Avatarı", price: 80, icon: "🐼", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Panda" },
-    { id: 'a3', name: "Tilki Avatarı", price: 100, icon: "🦊", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Fox" },
-    { id: 'a4', name: "Baykuş Avatarı", price: 120, icon: "🦉", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Owl" },
-    { id: 'a5', name: "Kaplan Avatarı", price: 150, icon: "🐯", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Tiger" },
-    { id: 'a6', name: "Kurt Avatarı", price: 180, icon: "🐺", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Wolf" },
-    { id: 'a7', name: "Ejderha Avatarı", price: 220, icon: "🐲", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Dragon" },
-    { id: 'a8', name: "Robot Avatarı", price: 250, icon: "🤖", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Robot" },
-    { id: 'a9', name: "Uzaylı Avatarı", price: 300, icon: "👽", url: "https://api.dicebear.com/7.x/bottts/svg?seed=Alien" },
-    { id: 'a10', name: "Kral Avatar", price: 400, icon: "👑", url: "https://api.dicebear.com/7.x/bottts/svg?seed=King" }
-  ];
-
-  function initRegisterAvatars() {
-    const grid = document.getElementById('registerAvatarGrid');
-    if(!grid) return;
-    grid.innerHTML = "";
-    for(let i = 0; i < 4; i++) {
-      const url = animalAvatars[i];
-      const isSel = i === 0 ? "selected" : "";
-      if(i === 0) selectedAvatarUrl = url;
-      grid.innerHTML += `<img src="${url}" class="avatar-option ${isSel}" onclick="selectAvatar(this, '${url}')">`;
-    }
-  }
-
-  function showScreen(screenId) {
-    if(chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById(screenId);
-    if(target) target.classList.add('active');
-    if(screenId === 'screenAuthRegister') initRegisterAvatars();
-  }
-
-  function selectAvatar(el, url) {
-    document.querySelectorAll('.avatar-option').forEach(img => img.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedAvatarUrl = url;
-  }
-
-  function switchTab(screenId, btn) {
-    if(chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById(screenId);
-    if(target) target.classList.add('active');
-    if(btn) {
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
-    if(screenId === 'screenDashboard') renderTasks();
-    if(screenId === 'screenProfile') updateProfileUI();
-    if(screenId === 'screenHome') loadFeed();
-    if(screenId === 'screenStore') renderStore();
-    if(screenId === 'screenFriends') { loadFriendsList(); loadFriendRequests(); }
-    if(screenId === 'screenAdminReports') loadReports();
-    if(screenId === 'screenAdminFeedbacks') loadFeedbacks();
-  }
-
-  async function handleRegister() {
-    const username = document.getElementById('regUsername').value.trim();
-    const password = document.getElementById('regPassword').value.trim();
-    const fullName = document.getElementById('regFullName').value.trim();
-
-    if (!username || !password || !fullName) { alert("Tüm alanları doldurun!"); return; }
-    if(adminAccounts[username]) { alert("Bu kullanıcı adı adminlere aittir!"); return; }
-
-    currentUser = { username, password, fullName, avatar: selectedAvatarUrl || animalAvatars[0], points: 100, claimedTasks: [], friends: [], friendRequests: [], inventory: [] };
-    if(db) { try { await db.collection('users').doc(username).set(currentUser); } catch(e) {} }
-    enterMainApp();
-  }
-
-  async function handleLogin() {
-    const username = document.getElementById('loginUsername').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
-    if(!username || !password) { alert("Kullanıcı adı ve şifre girin!"); return; }
-
-    if(db) {
-      try {
-        const doc = await db.collection('users').doc(username).get();
-        if(doc.exists) { currentUser = doc.data(); enterMainApp(); return; }
-      } catch(e) {}
-    }
-    currentUser = { username, fullName: username, avatar: animalAvatars[0], points: 100, claimedTasks: [], friends: [], friendRequests: [], inventory: [] };
-    enterMainApp();
-  }
-
-  function handleAdminLogin() {
-    const username = document.getElementById('adminLoginUsername').value.trim();
-    const password = document.getElementById('adminLoginPassword').value.trim();
-    if(adminAccounts[username] && adminAccounts[username] === password) {
-      currentUser = {
-        username: username,
-        password: password,
-        fullName: "Sistem Yöneticisi (" + username + ")",
-        avatar: adminAvatarsMap[username] || animalAvatars[0],
-        points: 9999,
-        claimedTasks: [],
-        friends: [],
-        friendRequests: [],
-        inventory: []
-      };
-      enterMainApp();
-    } else {
-      alert("Hatalı admin bilgileri!");
-    }
-  }
-
-  function enterMainApp() {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screenDashboard').classList.add('active');
-    document.getElementById('bottomNav').style.display = 'flex';
-    document.getElementById('userPatiBadge').style.display = 'flex';
-    if(adminAccounts[currentUser?.username]) currentUser.avatar = adminAvatarsMap[currentUser.username];
-    checkDailyReset();
-    updateUI();
-    renderTasks();
-  }
-
-  function checkDailyReset() {
-    const now = new Date();
-    const todayStr = now.toDateString();
-    if(currentUser.lastTaskResetDate !== todayStr) {
-      currentUser.lastTaskResetDate = todayStr;
-      currentUser.claimedTasks = [];
-      updateUI();
-    }
-  }
-
-  function updateUI() {
-    if(!currentUser) return;
-    const pts = document.getElementById('headerPoints');
-    if(pts) pts.innerText = currentUser.points;
-    if(db && !adminAccounts[currentUser.username]) {
-      db.collection('users').doc(currentUser.username).set(currentUser, { merge: true }).catch(()=>{});
-    }
-  }
-
-  function updateProfileUI() {
-    if(!currentUser) return;
-    let av = currentUser.avatar;
-    if(adminAccounts[currentUser.username]) av = adminAvatarsMap[currentUser.username];
-    document.getElementById('profileAvatar').src = av;
-    document.getElementById('profileFullName').innerText = currentUser.fullName;
-    document.getElementById('profileUsername').innerText = "@" + currentUser.username;
-    document.getElementById('profilePoints').innerText = currentUser.points;
-
-    const invContainer = document.getElementById('userInventoryContainer');
-    if(!invContainer) return;
-    invContainer.innerHTML = "";
-    if(!currentUser.inventory || currentUser.inventory.length === 0) {
-      invContainer.innerHTML = "<span style='font-size:0.75rem; color:#888;'>Henüz envanterinde eşya yok.</span>";
-      return;
-    }
-    currentUser.inventory.forEach(item => {
-      if(item.type === 'badge') {
-        invContainer.innerHTML += `<div style="background:#FFF0F0; border:1px solid var(--primary); padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:700; color:var(--primary);">${item.icon} ${item.name}</div>`;
-      } else if(item.type === 'avatar') {
-        invContainer.innerHTML += `<div style="display:flex; align-items:center; gap:4px; background:#EBF5FB; border:1px solid #3498DB; padding:4px 8px; border-radius:8px; font-size:0.75rem; font-weight:700; color:#3498DB;"><img src="${item.url}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;"> ${item.name} <button class="btn btn-sm" style="padding:2px 4px;font-size:0.6rem;margin-left:4px;" onclick="equipAvatar('${item.url}')">Kuşan</button></div>`;
-      }
-    });
-  }
-
-  function equipAvatar(url) {
-    currentUser.avatar = url;
-    updateUI();
-    updateProfileUI();
-    alert("Avatar başarıyla kuşandı! 🐾");
-  }
-
-  function renderTasks() {
-    checkDailyReset();
-    const taskListDiv = document.getElementById('taskList');
-    if(!taskListDiv) return;
-    taskListDiv.innerHTML = "";
-    
-    // Günün tarihine göre farklı görev seti seç (1, 2 veya 3)
-    const dayNum = (new Date().getDate() % 3) + 1;
-    const currentTasks = taskPools[dayNum] || taskPools[1];
-
-    currentTasks.forEach(t => {
-      const isCompleted = currentUser.claimedTasks && currentUser.claimedTasks.includes(t.id);
-      taskListDiv.innerHTML += `
-        <div class="task-card">
-          <div class="task-info">
-            <div>
-              <div class="task-title">${t.title}</div>
-              <div class="task-reward">+${t.reward} Pati Puan</div>
-            </div>
-            <button class="btn btn-sm" ${isCompleted ? 'disabled style="background:#A0AEC0;"' : ''} onclick="verifyTask(${t.id}, ${t.reward})">
-              ${isCompleted ? 'Tamamlandı' : 'Kanıtla'}
-            </button>
-          </div>
-          ${!isCompleted ? `<input type="file" id="taskFile${t.id}" accept="image/*" style="font-size:0.75rem; margin-top:4px;">` : ''}
-        </div>
-      `;
-    });
-  }
-
-  function verifyTask(taskId, reward) {
-    const fileInput = document.getElementById(`taskFile${taskId}`);
-    if(!fileInput || fileInput.files.length === 0) { alert("Lütfen kanıt fotoğrafı seçin! 🐾"); return; }
-    currentUser.points += reward;
-    if(!currentUser.claimedTasks) currentUser.claimedTasks = [];
-    currentUser.claimedTasks.push(taskId);
-    updateUI();
-    renderTasks();
-    alert(`Tebrikler! ${reward} Pati Puan kazandın!`);
-  }
-
-  function renderStore() {
-    const grid = document.getElementById('storeGridContainer');
-    if(!grid) return;
-    grid.innerHTML = "";
-    
-    if(!currentUser.inventory) currentUser.inventory = [];
-
-    let html = `<h4 style="font-size:0.85rem; font-weight:800; color:var(--primary); margin-bottom:6px;">🏅 Rozetler (10 Adet)</h4><div class="store-grid">`;
-    storeBadges.forEach(b => {
-      const isOwned = currentUser.inventory.some(i => i.name === b.name);
-      html += `
-        <div class="store-item">
-          <div style="font-size: 1.5rem;">${b.icon}</div>
-          <div style="font-weight: 700; font-size: 0.75rem;">${b.name}</div>
-          <div style="font-size: 0.7rem; color: var(--primary); font-weight: 800;">${b.price} Puan</div>
-          <button class="btn btn-sm ${isOwned ? '' : 'btn-secondary'}" ${isOwned ? 'disabled style="background:#A0AEC0; color:#fff;"' : `onclick="buyStoreItem(${b.price}, '${b.name}', '${b.icon}')"`}>
-            ${isOwned ? 'Satın Alındı' : 'Satın Al'}
-          </button>
-        </div>
-      `;
-    });
-    html += `</div><h4 style="font-size:0.85rem; font-weight:800; color:var(--secondary); margin:12px 0 6px 0;">🐾 Özel Avatarlar (10 Adet)</h4><div class="store-grid">`;
-    storeAvatars.forEach(a => {
-      const isOwned = currentUser.inventory.some(i => i.name === a.name);
-      html += `
-        <div class="store-item">
-          <img src="${a.url}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;margin:auto;">
-          <div style="font-weight: 700; font-size: 0.75rem;">${a.name}</div>
-          <div style="font-size: 0.7rem; color: var(--primary); font-weight: 800;">${a.price} Puan</div>
-          <button class="btn btn-sm ${isOwned ? '' : 'btn-secondary'}" ${isOwned ? 'disabled style="background:#A0AEC0; color:#fff;"' : `onclick="buyAvatarItem(${a.price}, '${a.name}', '${a.url}', '${a.icon}')"`}>
-            ${isOwned ? 'Satın Alındı' : 'Avatarı Al'}
-          </button>
-        </div>
-      `;
-    });
-    html += `</div>`;
-    grid.innerHTML = html;
-  }
-
-  function buyStoreItem(price, name, icon) {
-    if(currentUser.points < price) { alert("Yeterli Pati Puanın yok!"); return; }
-    currentUser.points -= price;
-    if(!currentUser.inventory) currentUser.inventory = [];
-    currentUser.inventory.push({ type: 'badge', name, icon });
-    updateUI();
-    renderStore();
-    alert(`Tebrikler! "${name}" rozetini satın aldın ve envanterine eklendi! 🏅`);
-  }
-
-  function buyAvatarItem(price, name, url, icon) {
-    if(currentUser.points < price) { alert("Yeterli Pati Puanın yok!"); return; }
-    currentUser.points -= price;
-    if(!currentUser.inventory) currentUser.inventory = [];
-    currentUser.inventory.push({ type: 'avatar', name, url, icon });
-    updateUI();
-    renderStore();
-    alert(`Tebrikler! "${name}" avatarını satın aldın! Profilden kuşanabilirsin. 🐾`);
-  }
-
-  function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert(`Numara kopyalandı: ${text} 📋`);
-    }).catch(() => {
-      prompt("Numarayı kopyalamak için seçin:", text);
-    });
-  }
-
-  function openNearestVetMap() {
-    if(navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        window.open(`https://www.google.com/maps/search/veteriner+kliniği/@${lat},${lon},14z`, '_blank');
-      }, () => {
-        window.open(`https://www.google.com/maps/search/veteriner+kliniği/`, '_blank');
-      });
-    } else {
-      window.open(`https://www.google.com/maps/search/veteriner+kliniği/`, '_blank');
-    }
-  }
-
-  async function openFeedbackModal() {
-    const txt = prompt("Öneri, istek veya şikayetini yaz:");
-    if(!txt || !db) return;
-    await db.collection('feedbacks').add({ username: currentUser.username, text: txt, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-    alert("Geri bildirimin yöneticilere iletildi!");
-  }
-
-  async function addPost() {
-    const txt = document.getElementById('feedInput').value.trim();
-    const fileInput = document.getElementById('feedImageFile');
-    if(!txt && fileInput.files.length === 0) return;
-
-    let av = currentUser.avatar;
-    if(adminAccounts[currentUser.username]) av = adminAvatarsMap[currentUser.username];
-
-    if(fileInput.files.length > 0) {
-      const reader = new FileReader();
-      reader.readAsDataURL(fileInput.files[0]);
-      reader.onload = async function() {
-        if(db) await db.collection('posts').add({ username: currentUser.username, avatar: av, text: txt, image: reader.result, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-        document.getElementById('feedInput').value = ""; document.getElementById('feedImageFile').value = "";
-      };
-    } else {
-      if(db) await db.collection('posts').add({ username: currentUser.username, avatar: av, text: txt, image: "", timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-      document.getElementById('feedInput').value = "";
-    }
-  }
-
-  function loadFeed() {
-    const feedContainer = document.getElementById('feedList');
-    const actionButtons = document.getElementById('adminActionButtons');
-    if(!feedContainer) return;
-
-    const isAdmin = adminAccounts[currentUser?.username];
-    if(isAdmin && actionButtons) {
-      actionButtons.innerHTML = `
-        <button class="btn btn-sm btn-warning" onclick="switchTab('screenAdminReports')">🚨 Şikayetler</button>
-        <button class="btn btn-sm btn-info" onclick="switchTab('screenAdminFeedbacks')">💬 Öneriler</button>
-      `;
-    } else if(actionButtons) {
-      actionButtons.innerHTML = "";
-    }
-
-    if(db) {
-      db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-        feedContainer.innerHTML = "";
-        snapshot.forEach(doc => {
-          const d = doc.data();
-          const postId = doc.id;
-          let pAv = d.avatar || animalAvatars[0];
-          if(adminAccounts[d.username]) pAv = adminAvatarsMap[d.username];
-
-          feedContainer.innerHTML += `
-            <div class="feed-card">
-              <div class="feed-header">
-                <img src="${pAv}" class="feed-avatar">
-                <div style="font-weight:700; font-size:0.8rem;">@${d.username}</div>
-                <div style="margin-left:auto;">
-                  ${isAdmin ? `<button class="btn btn-sm btn-danger" onclick="deletePost('${postId}')">Sil</button>` : `<button class="btn btn-sm btn-warning" onclick="reportPost('${postId}', '${d.username}', '${(d.text||'').replace(/'/g,"\\'")}')">Şikayet</button>`}
+    <div class="container">
+        <!-- ANA SAYFA / GÖREVLER -->
+        <div id="view-home" class="view-section active">
+            <div class="card">
+                <h2>📋 Günlük Görevler</h2>
+                <div id="taskList">
+                    <div class="list-item">
+                        <span>🐾 Sokak kedilerine mama ver</span>
+                        <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="completeTask(this)">Tamamla</button>
+                    </div>
+                    <div class="list-item">
+                        <span>💧 Bir kap su bırak</span>
+                        <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="completeTask(this)">Tamamla</button>
+                    </div>
                 </div>
-              </div>
-              <div style="font-size:0.85rem;">${d.text || ''}</div>
-              ${d.image ? `<img src="${d.image}" class="feed-img">` : ''}
             </div>
-          `;
-        });
-      });
-    }
-  }
-
-  async function deletePost(postId) {
-    if(confirm("Bu gönderiyi silmek istiyor musun?") && db) {
-      await db.collection('posts').doc(postId).delete();
-    }
-  }
-
-  async function reportPost(postId, owner, text) {
-    if(confirm(`@${owner} adlı kullanıcının bu gönderisini şikayet etmek istiyor musun?`) && db) {
-      await db.collection('reports').add({ postId, postOwner: owner, postText: text, reportedBy: currentUser.username, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-      alert("Şikayet yöneticilere iletildi.");
-    }
-  }
-
-  function loadReports() {
-    const list = document.getElementById('reportsList');
-    if(!list || !db) return;
-    db.collection('reports').orderBy('timestamp', 'desc').onSnapshot(snap => {
-      list.innerHTML = "";
-      if(snap.empty) { list.innerHTML = "<p style='font-size:0.8rem; color:#888; text-align:center;'>Şikayet yok.</p>"; return; }
-      snap.forEach(doc => {
-        const d = doc.data();
-        list.innerHTML += `
-          <div class="report-card">
-            <div style="font-size:0.8rem; font-weight:700; color:var(--primary);">Şikayet Eden: @${d.reportedBy} | Edilen: @${d.postOwner}</div>
-            <div style="font-size:0.8rem; background:white; padding:6px; border-radius:6px; margin:6px 0;">"${d.postText || '[Fotoğraf]'}"</div>
-            <div style="display:flex; gap:4px; flex-wrap:wrap;">
-              <button class="btn btn-sm btn-danger" onclick="deletePost('${d.postId}'); dismissReport('${doc.id}')">Gönderiyi Sil</button>
-              <button class="btn btn-sm btn-warning" onclick="warnUser('${d.postOwner}')">⚠️ Uyarı Gönder</button>
-              <button class="btn btn-sm btn-admin" onclick="banUser('${d.postOwner}')">🔨 Banla</button>
-              <button class="btn btn-sm btn-secondary" onclick="dismissReport('${doc.id}')">Yoksay</button>
-            </div>
-          </div>
-        `;
-      });
-    });
-  }
-
-  async function dismissReport(id) { if(db) await db.collection('reports').doc(id).delete(); }
-
-  async function warnUser(username) {
-    const reason = prompt(`@${username} adlı kullanıcıya gönderilecek uyarı mesajı:`);
-    if(!reason || !db) return;
-    await db.collection('chats').doc(getRoomId(currentUser.username, username)).collection('messages').add({
-      sender: currentUser.username, text: `🚨 [YÖNETİCİ UYARISI]: ${reason}`, type: 'text', timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert(`@${username} adlı kullanıcıya uyarı gönderildi.`);
-  }
-
-  async function banUser(username) {
-    if(confirm(`@${username} adlı kullanıcıyı banlamak istediğinize emin misiniz?`) && db) {
-      await db.collection('users').doc(username).delete();
-      alert(`@${username} sistemden banlandı.`);
-    }
-  }
-
-  function loadFeedbacks() {
-    const list = document.getElementById('feedbacksList');
-    if(!list || !db) return;
-    db.collection('feedbacks').orderBy('timestamp', 'desc').onSnapshot(snap => {
-      list.innerHTML = "";
-      if(snap.empty) { list.innerHTML = "<p style='font-size:0.8rem; color:#888; text-align:center;'>Geri bildirim yok.</p>"; return; }
-      snap.forEach(doc => {
-        const d = doc.data();
-        list.innerHTML += `
-          <div class="report-card" style="border-color:#3498DB; background:#EBF5FB;">
-            <div style="font-size:0.8rem; font-weight:700; color:#3498DB;">Gönderen: @${d.username}</div>
-            <div style="font-size:0.8rem; background:white; padding:6px; border-radius:6px; margin:6px 0;">"${d.text}"</div>
-            <button class="btn btn-sm btn-info" onclick="deleteFeedback('${doc.id}')">Okundu / Sil</button>
-          </div>
-        `;
-      });
-    });
-  }
-
-  async function deleteFeedback(id) { if(db) await db.collection('feedbacks').doc(id).delete(); }
-
-  async function sendFriendRequest() {
-    const target = document.getElementById('searchUserField').value.trim();
-    if(!target || target === currentUser.username) { alert("Geçersiz."); return; }
-    if(db) {
-      const ref = db.collection('users').doc(target);
-      const snap = await ref.get();
-      if(snap.exists) {
-        let data = snap.data();
-        if(!data.friendRequests) data.friendRequests = [];
-        data.friendRequests.push(currentUser.username);
-        await ref.set(data, { merge: true });
-        alert("Arkadaşlık isteği gönderildi!");
-        document.getElementById('searchUserField').value = "";
-      } else { alert("Kullanıcı bulunamadı."); }
-    }
-  }
-
-  function loadFriendRequests() {
-    const container = document.getElementById('friendRequestsContainer');
-    if(!container || !db) return;
-    db.collection('users').doc(currentUser.username).onSnapshot(doc => {
-      if(doc.exists) {
-        currentUser = doc.data();
-        container.innerHTML = "";
-        if(currentUser.friendRequests && currentUser.friendRequests.length > 0) {
-          currentUser.friendRequests.forEach(req => {
-            container.innerHTML += `
-              <div class="friend-card" style="background:#FFF5F5;">
-                <span style="font-size:0.8rem; font-weight:700;">@${req}</span>
-                <button class="btn btn-sm btn-secondary" onclick="acceptFriend('${req}')">Kabul Et</button>
-              </div>
-            `;
-          });
-        }
-        loadFriendsList();
-      }
-    });
-  }
-
-  async function acceptFriend(req) {
-    if(!currentUser.friends) currentUser.friends = [];
-    currentUser.friends.push(req);
-    currentUser.friendRequests = currentUser.friendRequests.filter(u => u !== req);
-    if(db) await db.collection('users').doc(currentUser.username).set(currentUser, { merge: true });
-    loadFriendRequests();
-  }
-
-  function loadFriendsList() {
-    const container = document.getElementById('friendListContainer');
-    if(!container) return;
-    container.innerHTML = "";
-    if(!currentUser.friends || currentUser.friends.length === 0) {
-      container.innerHTML = "<p style='font-size:0.75rem; color:#888; text-align:center;'>Henüz arkadaşın yok.</p>";
-      return;
-    }
-    currentUser.friends.forEach(f => {
-      container.innerHTML += `
-        <div class="friend-card">
-          <span style="font-size:0.8rem; font-weight:700;">@${f}</span>
-          <button class="btn btn-sm btn-secondary" onclick="openChat('${f}')">Mesaj</button>
         </div>
-      `;
-    });
-  }
 
-  function openChat(friend) {
-    currentChatFriend = friend;
-    document.getElementById('chatHeaderUsername').innerText = "@" + friend;
-    showScreen('screenChat');
-    loadChatMessages();
-  }
-
-  function getRoomId(u1, u2) { return u1 < u2 ? `${u1}_${u2}` : `${u2}_${u1}`; }
-
-  function loadChatMessages() {
-    const list = document.getElementById('chatMessagesList');
-    if(!list || !db) return;
-    const roomId = getRoomId(currentUser.username, currentChatFriend);
-    db.collection('chats').doc(roomId).collection('messages').orderBy('timestamp', 'asc').onSnapshot(snap => {
-      list.innerHTML = "";
-      snap.forEach(doc => {
-        const m = doc.data();
-        const isMe = m.sender === currentUser.username;
-        if(m.type === 'coop') {
-          const completed = m.completed || false;
-          list.innerHTML += `
-            <div class="chat-msg ${isMe ? 'sent' : 'received'}">
-              <b>🤝 Ortak Görev:</b> ${m.desc} <br><small><i class="fa-solid fa-location-dot"></i> ${m.location || 'Konum belirtilmedi'}</small>
-              <div class="coop-card">
-                ${completed ? '✅ Tamamlandı (+40 Puan)' : `<input type="file" id="coopFile_${doc.id}" accept="image/*" style="font-size:0.7rem; margin-bottom:4px;"><button class="btn btn-sm btn-secondary" onclick="completeCoop('${roomId}', '${doc.id}')">Kanıt Yükle & Onayla</button>`}
-              </div>
+        <!-- SOS / HARİTA -->
+        <div id="view-sos" class="view-section">
+            <div class="card">
+                <h2>🚨 Acil SOS ve Harita</h2>
+                <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height: 1.5;">Yardıma muhtaç sokak hayvanları için anlık konumunu haritada paylaş ve ses duyur.</p>
+                <button class="btn" onclick="openMapLocation()">Konumumu Haritada Göster</button>
             </div>
-          `;
-        } else {
-          list.innerHTML += `<div class="chat-msg ${isMe ? 'sent' : 'received'}">${m.text}</div>`;
+        </div>
+
+        <!-- MAĞAZA (ROBOT TEMALI) -->
+        <div id="view-store" class="view-section">
+            <div class="card">
+                <h2>🛒 Mağaza (Robot Rozetleri)</h2>
+                <div class="list-item">
+                    <span>🤖 Turuncu Robot (50 Pati)</span>
+                    <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="buyBadge('Turuncu Robot', 50)">Satın Al</button>
+                </div>
+                <div class="list-item">
+                    <span>🛸 Uzaylı Robot (100 Pati)</span>
+                    <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="buyBadge('Uzaylı Robot', 100)">Satın Al</button>
+                </div>
+                <div class="list-item">
+                    <span>❤️ Kalp Robot (150 Pati)</span>
+                    <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="buyBadge('Kalp Robot', 150)">Satın Al</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- OYUN -->
+        <div id="view-game" class="view-section">
+            <div class="card">
+                <h2>🎮 Hafıza Mini Oyunu</h2>
+                <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height: 1.5;">Hafıza bulmacasını tamamla, ödülü kap!</p>
+                <button class="btn btn-secondary" onclick="completeGame()">Oyunu Tamamla & 50 Pati Kazan</button>
+            </div>
+        </div>
+
+        <!-- ARKADAŞLAR & İSTEKLER SEKMESİ -->
+        <div id="view-friends" class="view-section">
+            <div class="card">
+                <h2>👥 Sosyal Merkez</h2>
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" onclick="switchFriendTab('requests', this)">İstekler</button>
+                    <button class="sub-tab-btn" onclick="switchFriendTab('friendsList', this)">Arkadaşlar</button>
+                </div>
+
+                <div id="tab-requests">
+                    <input type="text" id="friendUsernameInput" placeholder="Kullanıcı adı girin...">
+                    <button class="btn" onclick="sendFriendRequest()" style="margin-bottom:16px;">İstek Gönder</button>
+                    <div id="incomingRequestsList">
+                        <div class="list-item">
+                            <span>@ART_Arjin (İstek)</span>
+                            <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;">Kabul Et</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-friendsList" style="display:none;">
+                    <div id="acceptedFriendsList">
+                        <div class="list-item">
+                            <span>@ART_Arjin (Arkadaş)</span>
+                            <button class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;">Mesaj</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFİL -->
+        <div id="view-profile" class="view-section">
+            <div class="card" style="text-align: center; padding: 30px 20px;">
+                <div id="profileAvatar" style="font-size: 60px; margin-bottom: 12px; background: #F1F5F9; width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-left: auto; margin-right: auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">🤖</div>
+                <h2 id="profileUsernameName" style="justify-content: center; font-size: 20px;">Rojhat (Admin)</h2>
+                <p id="profileRole" style="color: var(--primary); font-weight: 700; font-size: 13px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Sistem Yöneticisi</p>
+                <button class="btn" style="background: #EF4444; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);" onclick="logoutUser()">Çıkış Yap</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Yüzen Alt Menü -->
+    <nav>
+        <a class="nav-item active" onclick="switchView('home', this)">
+            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Görevler
+        </a>
+        <a class="nav-item" onclick="switchView('sos', this)">
+            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            SOS
+        </a>
+        <a class="nav-item" onclick="switchView('store', this)">
+            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            Mağaza
+        </a>
+        <a class="nav-item" onclick="switchView('game', this)">
+            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Oyun
+        </a>
+        <a class="nav-item" onclick="switchView('friends', this)">
+            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            Sosyal
+        </a>
+        <a class="nav-item" onclick="switchView('profile', this)">
+            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            Profil
+        </a>
+    </nav>
+
+    <script>
+        function switchView(viewName, element) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('view-' + viewName).classList.add('active');
+            if(element) element.classList.add('active');
         }
-      });
-      list.scrollTop = list.scrollHeight;
-    });
-  }
 
-  async function sendPrivateMessage() {
-    const input = document.getElementById('chatInput');
-    const txt = input.value.trim();
-    if(!txt || !db) return;
-    const roomId = getRoomId(currentUser.username, currentChatFriend);
-    await db.collection('chats').doc(roomId).collection('messages').add({
-      sender: currentUser.username, text: txt, type: 'text', timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    input.value = "";
-  }
-
-  async function clearChatHistory() {
-    if(!confirm("Bu sohbetteki tüm mesajları silmek istiyor musun?") || !db) return;
-    const roomId = getRoomId(currentUser.username, currentChatFriend);
-    const snap = await db.collection('chats').doc(roomId).collection('messages').get();
-    const batch = db.batch();
-    snap.docs.forEach(d => batch.delete(d.ref));
-    await batch.commit();
-    alert("Sohbet temizlendi.");
-  }
-
-  async function openCoopModal() {
-    const now = new Date().getTime();
-    const lastCoop = currentUser.lastCoopTime || 0;
-    const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
-    if(now - lastCoop < oneWeekMs) {
-      const daysLeft = Math.ceil((oneWeekMs - (now - lastCoop)) / (1000 * 60 * 60 * 24));
-      alert(`Ortak görevler haftada bir kez yapılabilir! Tekrar oluşturmak için ${daysLeft} gün beklemelisin.`);
-      return;
-    }
-
-    const desc = prompt("Ortak görev adı / açıklaması:");
-    if(!desc) return;
-    const location = prompt("Görev için konum ismi veya adresi girin:");
-    if(!location || !db) return;
-
-    currentUser.lastCoopTime = now;
-    updateUI();
-
-    const roomId = getRoomId(currentUser.username, currentChatFriend);
-    await db.collection('chats').doc(roomId).collection('messages').add({
-      sender: currentUser.username, desc, location, type: 'coop', completed: false, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert("Haftalık ortak görev gönderildi!");
-  }
-
-  async function completeCoop(roomId, msgId) {
-    const fileInput = document.getElementById(`coopFile_${msgId}`);
-    if(!fileInput || fileInput.files.length === 0) { alert("Kanıt fotoğrafı yüklemelisin! 📸"); return; }
-    if(db) {
-      await db.collection('chats').doc(roomId).collection('messages').doc(msgId).update({ completed: true });
-      currentUser.points += 40; updateUI();
-      alert("Görev tamamlandı ve +40 puan eklendi! 🐾");
-    }
-  }
-
-  function deleteMyAccount() {
-    if(confirm("Hesabını silmek istiyor musun?")) {
-      currentUser = null;
-      document.getElementById('bottomNav').style.display = 'none';
-      document.getElementById('userPatiBadge').style.display = 'none';
-      showScreen('screenAuthWelcome');
-    }
-  }
-
-  let matchedPairs = 0;
-  function startMemoryGame() {
-    const todayStr = new Date().toDateString();
-    if(currentUser.lastGameDate === todayStr) {
-      alert("Hafıza oyununu günde sadece 1 kez oynayabilirsin! Yarın tekrar dene. 🎮");
-      return;
-    }
-
-    currentUser.lastGameDate = todayStr;
-    updateUI();
-
-    document.getElementById('btnStartGame').style.display = 'none';
-    document.getElementById('gameActiveArea').style.display = 'block';
-    matchedPairs = 0;
-    const icons = ["🐱", "🐶", "🐰", "🦊", "🐼", "🦁", "🐨", "🐯", "🐵", "🐧"];
-    let deck = [...icons, ...icons].sort(() => Math.random() - 0.5);
-    const grid = document.getElementById('memoryGridContainer');
-    grid.innerHTML = "";
-    deck.forEach((icon, idx) => {
-      grid.innerHTML += `<div class="memory-card" id="mcard_${idx}" onclick="flipCard(${idx}, '${icon}')">❓</div>`;
-    });
-  }
-  let flipped = [];
-  function flipCard(idx, icon) {
-    const el = document.getElementById(`mcard_${idx}`);
-    if(el.classList.contains('flipped') || flipped.length >= 2) return;
-    el.innerText = icon; el.classList.add('flipped');
-    flipped.push({ idx, icon });
-    if(flipped.length === 2) {
-      setTimeout(() => {
-        if(flipped[0].icon === flipped[1].icon) {
-          matchedPairs++;
-          document.getElementById('memoryMatches').innerText = matchedPairs;
-          if(matchedPairs === 10) { currentUser.points += 100; updateUI(); alert("Tebrikler! +100 puan kazandın!"); }
-        } else {
-          flipped.forEach(f => { const card = document.getElementById(`mcard_${f.idx}`); card.innerText = "❓"; card.classList.remove('flipped'); });
+        function switchFriendTab(tabName, btnElement) {
+            document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            if(tabName === 'requests') {
+                document.getElementById('tab-requests').style.display = 'block';
+                document.getElementById('tab-friendsList').style.display = 'none';
+            } else {
+                document.getElementById('tab-requests').style.display = 'none';
+                document.getElementById('tab-friendsList').style.display = 'block';
+            }
         }
-        flipped = [];
-      }, 500);
-    }
-  }
-</script>
 
+        function openMapLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
+                }, () => {
+                    alert("Konum alınamadı, lütfen izinleri kontrol edin.");
+                });
+            } else {
+                alert("Tarayıcınız konum özelliğini desteklemiyor.");
+            }
+        }
+
+        let userPoints = 1250;
+        function updatePointsDisplay() {
+            document.getElementById('userPointsDisplay').innerText = `🪙 ${userPoints} Pati`;
+        }
+
+        function completeTask(btn) {
+            userPoints += 10;
+            updatePointsDisplay();
+            btn.innerText = "Tamamlandı ✓";
+            btn.style.background = "#00B894";
+            btn.disabled = true;
+        }
+
+        function buyBadge(badgeName, cost) {
+            if(userPoints >= cost) {
+                userPoints -= cost;
+                updatePointsDisplay();
+                alert(`${badgeName} rozeti başarıyla satın alındı! 🤖`);
+            } else {
+                alert("Yeterli pati puanınız yok!");
+            }
+        }
+
+        function completeGame() {
+            userPoints += 50;
+            updatePointsDisplay();
+            alert("Tebrikler! Hafıza oyununu tamamladınız ve 50 Pati kazandınız! 🎮");
+        }
+
+        function sendFriendRequest() {
+            const username = document.getElementById('friendUsernameInput').value;
+            if(!username) return alert("Lütfen geçerli bir kullanıcı adı girin.");
+            alert(`${username} kullanıcısına arkadaşlık isteği gönderildi!`);
+            document.getElementById('friendUsernameInput').value = '';
+        }
+
+        function logoutUser() {
+            alert("Oturum kapatıldı.");
+            location.reload();
+        }
+
+        updatePointsDisplay();
+    </script>
 </body>
 </html>
