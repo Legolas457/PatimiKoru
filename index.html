@@ -3,33 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PatimiKoru - Sokak Hayvanları Destek Platformu</title>
+    <title>PatimiKoru</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <!-- Google Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #FF6B6B;
-            --primary-gradient: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-            --secondary-gradient: linear-gradient(135deg, #00B894 0%, #00CEC9 100%);
-            --bg-color: #F4F7FB;
+            --primary-hover: #EE5253;
+            --bg-color: #F8F9FA;
             --card-bg: #FFFFFF;
-            --text-main: #1E293B;
-            --text-secondary: #64748B;
-            --border: #E2E8F0;
+            --text-main: #2D3436;
+            --text-secondary: #636E72;
+            --border: #DFE6E9;
             --accent: #00B894;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            --radius: 16px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
@@ -38,15 +32,12 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            padding-bottom: 90px;
+            padding-bottom: 70px;
         }
 
-        /* Şık Modern Üst Bar */
         header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 16px 20px;
+            background-color: var(--card-bg);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -58,28 +49,23 @@
 
         .logo {
             font-size: 20px;
-            font-weight: 800;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 8px;
-            letter-spacing: -0.5px;
         }
 
         .points-badge {
-            background: linear-gradient(135deg, #FFF3CD 0%, #FFE8A1 100%);
-            color: #856404;
-            padding: 8px 14px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 13px;
+            background: #FFEaa7;
+            color: #D63031;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
-            border: 1px solid rgba(255, 193, 7, 0.3);
+            gap: 5px;
         }
 
         .container {
@@ -90,91 +76,67 @@
             flex: 1;
         }
 
-        /* Modern Kart Tasarımı */
         .card {
             background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 16px;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         h2 {
             font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 10px;
-            letter-spacing: -0.3px;
+            gap: 8px;
         }
 
-        /* Butonlar */
         .btn {
-            background: var(--primary-gradient);
+            background-color: var(--primary);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
+            transition: background 0.2s;
         }
 
-        .btn:active {
-            transform: scale(0.98);
+        .btn:hover {
+            background-color: var(--primary-hover);
         }
 
         .btn-secondary {
-            background: var(--secondary-gradient);
-            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.25);
+            background-color: var(--accent);
         }
 
         input, textarea {
             width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 12px;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
             outline: none;
-            font-size: 14px;
-            background: #FAFCFF;
-            transition: all 0.2s;
         }
 
-        input:focus, textarea:focus {
+        input:focus {
             border-color: var(--primary);
-            background: #FFFFFF;
-            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
         }
 
-        /* Alt Navigasyon (Floating Dock Tarzı) */
+        /* Navigation Bar */
         nav {
             position: fixed;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            max-width: 560px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-around;
-            padding: 8px 6px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 10px 0;
             z-index: 1000;
         }
 
@@ -184,76 +146,55 @@
             align-items: center;
             text-decoration: none;
             color: var(--text-secondary);
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 12px;
             gap: 4px;
             cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 14px;
-            transition: all 0.2s;
         }
 
         .nav-item.active {
             color: var(--primary);
-            background: rgba(255, 107, 107, 0.08);
         }
 
         .nav-item svg {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
         }
 
         .view-section {
             display: none;
-            animation: fadeIn 0.3s ease;
         }
 
         .view-section.active {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Sekme Butonları (İstekler / Arkadaşlar) */
         .sub-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            background: #F1F5F9;
-            padding: 4px;
-            border-radius: 12px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
         .sub-tab-btn {
             flex: 1;
-            padding: 10px;
-            background: transparent;
+            padding: 8px;
+            background: #dfe6e9;
             border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 13px;
-            color: var(--text-secondary);
+            border-radius: 6px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .sub-tab-btn.active {
-            background: #FFFFFF;
-            color: var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: var(--primary);
+            color: white;
         }
 
         .list-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 12px;
+            padding: 10px;
             border-bottom: 1px solid var(--border);
-            font-weight: 500;
-            font-size: 14px;
         }
 
         .list-item:last-child {
@@ -278,14 +219,7 @@
             <div class="card">
                 <h2>📋 Günlük Görevler</h2>
                 <div id="taskList">
-                    <div class="list-item">
-                        <span>🐾 Sokak kedilerine mama ver</span>
-                        <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="completeTask(this)">Tamamla</button>
-                    </div>
-                    <div class="list-item">
-                        <span>💧 Bir kap su bırak</span>
-                        <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="completeTask(this)">Tamamla</button>
-                    </div>
+                    <!-- Dinamik görevler -->
                 </div>
             </div>
         </div>
@@ -294,7 +228,7 @@
         <div id="view-sos" class="view-section">
             <div class="card">
                 <h2>🚨 Acil SOS ve Harita</h2>
-                <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height: 1.5;">Yardıma muhtaç sokak hayvanları için anlık konumunu haritada paylaş ve ses duyur.</p>
+                <p style="font-size:14px; color:var(--text-secondary); margin-bottom:10px;">Yardıma muhtaç sokak hayvanları için konum bildir veya haritada göster.</p>
                 <button class="btn" onclick="openMapLocation()">Konumumu Haritada Göster</button>
             </div>
         </div>
@@ -305,15 +239,15 @@
                 <h2>🛒 Mağaza (Robot Rozetleri)</h2>
                 <div class="list-item">
                     <span>🤖 Turuncu Robot (50 Pati)</span>
-                    <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="buyBadge('Turuncu Robot', 50)">Satın Al</button>
+                    <button class="btn" onclick="buyBadge('Turuncu Robot', 50)">Satın Al</button>
                 </div>
                 <div class="list-item">
                     <span>🛸 Uzaylı Robot (100 Pati)</span>
-                    <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="buyBadge('Uzaylı Robot', 100)">Satın Al</button>
+                    <button class="btn" onclick="buyBadge('Uzaylı Robot', 100)">Satın Al</button>
                 </div>
                 <div class="list-item">
                     <span>❤️ Kalp Robot (150 Pati)</span>
-                    <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="buyBadge('Kalp Robot', 150)">Satın Al</button>
+                    <button class="btn" onclick="buyBadge('Kalp Robot', 150)">Satın Al</button>
                 </div>
             </div>
         </div>
@@ -322,8 +256,8 @@
         <div id="view-game" class="view-section">
             <div class="card">
                 <h2>🎮 Hafıza Mini Oyunu</h2>
-                <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px; line-height: 1.5;">Hafıza bulmacasını tamamla, ödülü kap!</p>
-                <button class="btn btn-secondary" onclick="completeGame()">Oyunu Tamamla & 50 Pati Kazan</button>
+                <p style="font-size:14px; margin-bottom:10px;">Oyunu tamamla ve 50 Pati Puanı kazan!</p>
+                <button class="btn" onclick="completeGame()">Oyunu Tamamla & Puanı Al</button>
             </div>
         </div>
 
@@ -332,72 +266,63 @@
             <div class="card">
                 <h2>👥 Sosyal Merkez</h2>
                 <div class="sub-tabs">
-                    <button class="sub-tab-btn active" onclick="switchFriendTab('requests', this)">İstekler</button>
-                    <button class="sub-tab-btn" onclick="switchFriendTab('friendsList', this)">Arkadaşlar</button>
+                    <button class="sub-tab-btn active" onclick="switchFriendTab('requests')">İstekler</button>
+                    <button class="sub-tab-btn" onclick="switchFriendTab('friendsList')">Arkadaşlar</button>
                 </div>
 
                 <div id="tab-requests">
-                    <input type="text" id="friendUsernameInput" placeholder="Kullanıcı adı girin...">
-                    <button class="btn" onclick="sendFriendRequest()" style="margin-bottom:16px;">İstek Gönder</button>
-                    <div id="incomingRequestsList">
-                        <div class="list-item">
-                            <span>@ART_Arjin (İstek)</span>
-                            <button class="btn" style="width: auto; padding: 6px 12px; font-size: 12px;">Kabul Et</button>
-                        </div>
-                    </div>
+                    <input type="text" id="friendUsernameInput" placeholder="Kullanıcı adı...">
+                    <button class="btn" onclick="sendFriendRequest()" style="width:100%; margin-bottom:15px;">İstek Gönder</button>
+                    <div id="incomingRequestsList"></div>
                 </div>
 
                 <div id="tab-friendsList" style="display:none;">
-                    <div id="acceptedFriendsList">
-                        <div class="list-item">
-                            <span>@ART_Arjin (Arkadaş)</span>
-                            <button class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 12px;">Mesaj</button>
-                        </div>
-                    </div>
+                    <div id="acceptedFriendsList"></div>
                 </div>
             </div>
         </div>
 
         <!-- PROFİL -->
         <div id="view-profile" class="view-section">
-            <div class="card" style="text-align: center; padding: 30px 20px;">
-                <div id="profileAvatar" style="font-size: 60px; margin-bottom: 12px; background: #F1F5F9; width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-left: auto; margin-right: auto; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">🤖</div>
-                <h2 id="profileUsernameName" style="justify-content: center; font-size: 20px;">Rojhat (Admin)</h2>
-                <p id="profileRole" style="color: var(--primary); font-weight: 700; font-size: 13px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">Sistem Yöneticisi</p>
-                <button class="btn" style="background: #EF4444; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);" onclick="logoutUser()">Çıkış Yap</button>
+            <div class="card" style="text-align: center;">
+                <div id="profileAvatar" style="font-size: 50px; margin-bottom: 10px;">🤖</div>
+                <h2 id="profileUsernameName" style="justify-content: center;">Kullanıcı</h2>
+                <p id="profileRole" style="color: var(--primary); font-weight: bold; margin-bottom: 15px;"></p>
+                <button class="btn" onclick="logoutUser()">Çıkış Yap</button>
             </div>
         </div>
     </div>
 
-    <!-- Modern Yüzen Alt Menü -->
+    <!-- Alt Navigasyon Menüsü -->
     <nav>
         <a class="nav-item active" onclick="switchView('home', this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
             Görevler
         </a>
         <a class="nav-item" onclick="switchView('sos', this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             SOS
         </a>
         <a class="nav-item" onclick="switchView('store', this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
             Mağaza
         </a>
         <a class="nav-item" onclick="switchView('game', this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             Oyun
         </a>
         <a class="nav-item" onclick="switchView('friends', this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            Sosyal
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            Arkadaşlar
         </a>
         <a class="nav-item" onclick="switchView('profile', this)">
-            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             Profil
         </a>
     </nav>
 
     <script>
+        // Sayfa geçişleri
         function switchView(viewName, element) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -406,19 +331,20 @@
             if(element) element.classList.add('active');
         }
 
-        function switchFriendTab(tabName, btnElement) {
+        function switchFriendTab(tabName) {
             document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
-            btnElement.classList.add('active');
-            
             if(tabName === 'requests') {
                 document.getElementById('tab-requests').style.display = 'block';
                 document.getElementById('tab-friendsList').style.display = 'none';
+                event.target.classList.add('active');
             } else {
                 document.getElementById('tab-requests').style.display = 'none';
                 document.getElementById('tab-friendsList').style.display = 'block';
+                event.target.classList.add('active');
             }
         }
 
+        // SOS Harita Yönlendirme
         function openMapLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
@@ -426,31 +352,24 @@
                     const lon = position.coords.longitude;
                     window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
                 }, () => {
-                    alert("Konum alınamadı, lütfen izinleri kontrol edin.");
+                    alert("Konum alınamadı, lütfen konum iznini kontrol edin.");
                 });
             } else {
                 alert("Tarayıcınız konum özelliğini desteklemiyor.");
             }
         }
 
-        let userPoints = 1250;
+        // Puan ve Mağaza İşlemleri
+        let userPoints = 100;
         function updatePointsDisplay() {
             document.getElementById('userPointsDisplay').innerText = `🪙 ${userPoints} Pati`;
-        }
-
-        function completeTask(btn) {
-            userPoints += 10;
-            updatePointsDisplay();
-            btn.innerText = "Tamamlandı ✓";
-            btn.style.background = "#00B894";
-            btn.disabled = true;
         }
 
         function buyBadge(badgeName, cost) {
             if(userPoints >= cost) {
                 userPoints -= cost;
                 updatePointsDisplay();
-                alert(`${badgeName} rozeti başarıyla satın alındı! 🤖`);
+                alert(`${badgeName} başarıyla satın alındı!`);
             } else {
                 alert("Yeterli pati puanınız yok!");
             }
@@ -459,18 +378,18 @@
         function completeGame() {
             userPoints += 50;
             updatePointsDisplay();
-            alert("Tebrikler! Hafıza oyununu tamamladınız ve 50 Pati kazandınız! 🎮");
+            alert("Tebrikler! Hafıza oyununu tamamladınız ve 50 Pati kazandınız!");
         }
 
         function sendFriendRequest() {
             const username = document.getElementById('friendUsernameInput').value;
-            if(!username) return alert("Lütfen geçerli bir kullanıcı adı girin.");
-            alert(`${username} kullanıcısına arkadaşlık isteği gönderildi!`);
+            if(!username) return alert("Lütfen bir kullanıcı adı girin.");
+            alert(`${username} kullanıcısına arkadaşlık isteği gönderildi.`);
             document.getElementById('friendUsernameInput').value = '';
         }
 
         function logoutUser() {
-            alert("Oturum kapatıldı.");
+            alert("Çıkış yapıldı.");
             location.reload();
         }
 
