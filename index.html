@@ -7,146 +7,167 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  
+  <!-- CSS KODLARI BURADA -->
+  <style>
+    :root {
+      --bg-color: #F8F6F0;
+      --surface-color: #FFFFFF;
+      --text-main: #1C2421;
+      --text-muted: #626D66;
+      --primary: #1F382B;
+      --primary-hover: #16281E;
+      --accent: #D96B43;
+      --accent-hover: #C55B33;
+      --border-color: #E2DDD3;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 2px 8px rgba(31, 56, 43, 0.04);
+      --shadow-md: 0 8px 24px rgba(31, 56, 43, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+    .hidden { display: none !important; }
+
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+    .btn-primary { background-color: var(--primary); color: #fff; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.95rem; transition: background 0.2s; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+    .btn-outline { background-color: transparent; color: var(--primary); border: 1.5px solid var(--primary); padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; }
+    .btn-ghost { color: var(--text-main); font-weight: 600; padding: 8px 14px; }
+    .btn-block { width: 100%; padding: 12px; }
+    .btn-sm { padding: 6px 14px; font-size: 0.85rem; }
+
+    .brand-logo { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .paw-badge { font-size: 1.2rem; background: rgba(217, 107, 67, 0.12); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+    .brand-text { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
+    .brand-text .dot { color: var(--accent); }
+
+    .landing-wrapper { max-width: 1100px; margin: 0 auto; width: 100%; padding: 24px 20px; flex: 1; display: flex; flex-direction: column; }
+    .landing-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    .header-actions { display: flex; gap: 10px; }
+
+    .hero-section { text-align: center; max-width: 800px; margin: 0 auto 60px auto; }
+    .eyebrow { display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 16px; text-transform: uppercase; }
+    .hero-title { font-family: 'Fraunces', serif; font-size: 3rem; line-height: 1.15; color: var(--primary); margin-bottom: 20px; }
+    .hero-title em { color: var(--accent); font-style: italic; }
+    .hero-desc { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .hero-cta-group { display: flex; gap: 14px; justify-content: center; margin-bottom: 48px; }
+
+    .hero-visual-card { position: relative; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); max-height: 420px; }
+    .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; max-height: 420px; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(28, 36, 33, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-card { background: var(--surface-color); width: 100%; max-width: 400px; padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); position: relative; }
+    .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.1rem; color: var(--text-muted); }
+    .modal-brand { font-family: 'Fraunces', serif; font-size: 1.2rem; color: var(--primary); font-weight: 700; margin-bottom: 16px; }
+    .modal-card h2 { font-family: 'Fraunces', serif; font-size: 1.6rem; color: var(--primary); margin-bottom: 6px; }
+    .modal-sub { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 6px; }
+    .form-group input { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.95rem; background: var(--bg-color); color: var(--text-main); outline: none; }
+
+    .app-wrapper { max-width: 680px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; padding-bottom: 90px; }
+    .app-topbar { background: var(--surface-color); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; }
+    .user-stats-pill { background: var(--bg-color); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; color: var(--primary); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    
+    .app-content { padding: 20px; flex: 1; }
+    .tab-panel .panel-header { margin-bottom: 20px; }
+    .tab-panel .panel-header h2 { font-family: 'Fraunces', serif; font-size: 1.5rem; color: var(--primary); margin-bottom: 4px; }
+    .tab-panel .panel-header p { font-size: 0.9rem; color: var(--text-muted); }
+
+    .cards-stack { display: flex; flex-direction: column; gap: 16px; }
+    .item-card { background: var(--surface-color); border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 18px; box-shadow: var(--shadow-sm); }
+    .item-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .item-card-title { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+    .item-card-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+    .reward-badge { background: rgba(217, 107, 67, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+
+    .composer-card { background: var(--surface-color); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px; }
+    .composer-card textarea { width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 0.95rem; background: transparent; }
+    .image-preview-box { position: relative; margin: 12px 0; border-radius: var(--radius-sm); overflow: hidden; max-height: 220px; }
+    .image-preview-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .composer-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 8px; }
+    .photo-upload-label { font-size: 0.85rem; font-weight: 600; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+    .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .shop-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; text-align: center; }
+    .shop-icon { font-size: 2.2rem; margin-bottom: 12px; display: block; }
+    .shop-card h3 { font-size: 1rem; color: var(--primary); margin-bottom: 6px; }
+    .shop-card p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; }
+
+    .game-box { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; text-align: center; }
+    .game-info { display: flex; justify-content: space-between; margin-bottom: 16px; font-weight: 600; color: var(--primary); }
+    .game-board { height: 280px; background: var(--bg-color); border-radius: var(--radius-sm); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--border-color); }
+    .target-paw { position: absolute; font-size: 2.2rem; cursor: pointer; user-select: none; }
+
+    .profile-hero-card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 20px; text-align: center; margin-bottom: 20px; }
+    .avatar-circle { width: 72px; height: 72px; background: var(--primary); color: #fff; font-family: 'Fraunces', serif; font-size: 1.8rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto; }
+    .profile-metrics { display: flex; justify-content: space-around; border-top: 1px solid var(--border-color); padding-top: 20px; }
+    .metric { display: flex; flex-direction: column; }
+    .metric strong { font-size: 1.2rem; color: var(--primary); font-family: 'Fraunces', serif; }
+
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface-color); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 8px 4px; z-index: 100; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-muted); flex: 1; padding: 6px 0; }
+    .nav-item span { font-size: 1.2rem; }
+    .nav-item small { font-size: 0.68rem; font-weight: 600; }
+    .nav-item.active { color: var(--accent); }
+
+    .toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 0.88rem; z-index: 1000; transition: opacity 0.3s; }
+  </style>
 </head>
 <body>
 
-  <!-- ================= KARŞILAMA (LANDING) EKRANI ================= -->
+  <!-- KARŞILAMA EKRANI -->
   <div id="landing-view" class="landing-wrapper">
-    <!-- Üst Menü -->
     <header class="landing-header">
       <div class="brand-logo" onclick="showLanding()">
         <span class="paw-badge">🐾</span>
         <span class="brand-text">patimikoru<span class="dot">.</span></span>
       </div>
       <div class="header-actions">
-        <button class="btn-ghost" onclick="openAuthModal('login')">Giriş yap</button>
-        <button class="btn-primary" onclick="openAuthModal('register')">Aramıza katıl</button>
+        <button class="btn-ghost" onclick="openAuthModal()">Giriş yap</button>
+        <button class="btn-primary" onclick="openAuthModal()">Aramıza katıl</button>
       </div>
     </header>
 
-    <!-- Ana Karşılama Alanı -->
     <main class="landing-main">
       <section class="hero-section">
         <span class="eyebrow">PATİ DOSTLARININ BULUŞMA NOKTASI</span>
-        <h1 class="hero-title">
-          Onların dünyasını, <em>birlikte</em> güzelleştirelim.
-        </h1>
-        <p class="hero-desc">
-          Sokaktaki canlara bir kap su bırak, mamasını paylaş, hikâyeni toplulukla buluştur ve her iyilikte Pati Puanı biriktir.
-        </p>
+        <h1 class="hero-title">Onların dünyasını, <em>birlikte</em> güzelleştirelim.</h1>
+        <p class="hero-desc">Sokaktaki canlara bir kap su bırak, mamasını paylaş ve her iyilikte Pati Puanı biriktir.</p>
         <div class="hero-cta-group">
-          <button class="btn-primary btn-lg" onclick="openAuthModal('register')">İyiliğe bir adım at →</button>
-          <button class="btn-outline btn-lg" onclick="scrollToSteps()">Önce bir göz at</button>
+          <button class="btn-primary btn-lg" onclick="openAuthModal()">İyiliğe bir adım at →</button>
         </div>
 
-        <!-- Görsel Kart & Rozet -->
+        <!-- Gönderdiğiniz 68212.jpg Görseli -->
         <div class="hero-visual-card">
-          <img
-            src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=900&q=80"
-            alt="Birlikte dost kedi ve köpek"
-            class="hero-img"
-          />
-          <div class="floating-badge-top">
-            <span>Bir pati</span>
-            <strong>bir dünya</strong>
-          </div>
-          <div class="floating-card-bottom">
-            <span class="heart-dot">🧡</span>
-            <div>
-              <strong>İyilik bulaşıcıdır.</strong>
-              <small>Bugün atılan küçük bir adım, bir canın hayatını değiştirir.</small>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3 Adımlı Rehber -->
-      <section id="steps-section" class="steps-section">
-        <div class="section-head">
-          <span class="eyebrow">NASIL ÇALIŞIR?</span>
-          <h2>Üç küçük adımda büyük değişim</h2>
-        </div>
-        <div class="steps-grid">
-          <div class="step-card">
-            <span class="step-num">01</span>
-            <h3>Bir iyilik seç</h3>
-            <p>Günlük görevlerden sana en yakın olanı seç; bir kap su koy veya mama bırak.</p>
-          </div>
-          <div class="step-card">
-            <span class="step-num">02</span>
-            <h3>Hikâyeni paylaş</h3>
-            <p>Yaptığın iyiliğin fotoğrafını ekle, topluluğa ilham ver ve puanını topla.</p>
-          </div>
-          <div class="step-card">
-            <span class="step-num">03</span>
-            <h3>İyiliği büyüt</h3>
-            <p>Biriktirdiğin Pati Puanları ile rozetler kazan, mağazadan ödüllerini al.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Özellik Önizleme Kartları -->
-      <section class="features-preview">
-        <div class="feature-box">
-          <span class="feat-icon">📋</span>
-          <h4>Günlük Görevler</h4>
-          <p>Her gün yenilenen iyilik görevleriyle sokaktaki dostlarımızı unutma.</p>
-        </div>
-        <div class="feature-box">
-          <span class="feat-icon">🌿</span>
-          <h4>Topluluk Akışı</h4>
-          <p>Diğer hayvanseverlerin paylaşımlarını gör, beğen ve yorum yap.</p>
-        </div>
-        <div class="feature-box">
-          <span class="feat-icon">🏅</span>
-          <h4>Pati Rozetleri</h4>
-          <p>İyilik yaptıkça seviyeni yükselt ve özel rozetlerin sahibi ol.</p>
+          <img src="68212.jpg" alt="Sevimli Dostlar" class="hero-img" />
         </div>
       </section>
     </main>
-
-    <!-- Alt Bilgi & Yönetici Girişi -->
-    <footer class="landing-footer">
-      <p>© 2026 patimikoru. Tüm hakları saklıdır.</p>
-      <button class="admin-link-btn" onclick="openAuthModal('admin')">Yönetici girişi</button>
-    </footer>
   </div>
 
-  <!-- ================= GİRİŞ / KAYIT / YÖNETİCİ MODALI ================= -->
+  <!-- GİRİŞ MODALI (SADECE İSİM) -->
   <div id="auth-modal" class="modal-overlay hidden">
     <div class="modal-card">
       <button class="modal-close" onclick="closeAuthModal()">✕</button>
       <div class="modal-brand">🐾 patimikoru<span class="dot">.</span></div>
-      <h2 id="auth-title">Tekrar hoş geldin!</h2>
-      <p id="auth-subtitle" class="modal-sub">İyilik yolculuğuna devam etmek için giriş yap.</p>
-
-      <form id="auth-form" onsubmit="handleAuthSubmit(event)">
-        <div id="register-name-group" class="form-group hidden">
-          <label for="auth-name">Adın veya Kullanıcı Adın</label>
-          <input type="text" id="auth-name" placeholder="Örn: PatiDostu" />
-        </div>
+      <h2>Hoş geldin!</h2>
+      <p class="modal-sub">İyilik yolculuğuna başlamak için ismini gir.</p>
+      <form onsubmit="handleAuthSubmit(event)">
         <div class="form-group">
-          <label for="auth-email">E-posta Adresi</label>
-          <input type="email" id="auth-email" placeholder="ornek@eposta.com" required />
+          <label for="auth-name">Adın veya Takma Adın</label>
+          <input type="text" id="auth-name" placeholder="Örn: PatiDostu" required />
         </div>
-        <div class="form-group">
-          <label for="auth-password">Şifre</label>
-          <input type="password" id="auth-password" placeholder="••••••••" required />
-        </div>
-        <button type="submit" id="auth-submit-btn" class="btn-primary btn-block">Giriş yap</button>
+        <button type="submit" class="btn-primary btn-block">Giriş yap ve Başla</button>
       </form>
-
-      <div id="auth-switch-area" class="auth-switch">
-        <span id="auth-switch-text">Henüz hesabın yok mu?</span>
-        <button type="button" id="auth-switch-btn" onclick="toggleAuthMode()">Aramıza katıl</button>
-      </div>
     </div>
   </div>
 
-  <!-- ================= UYGULAMA İÇİ ANA EKRAN ================= -->
+  <!-- UYGULAMA İÇİ 7 SEKMELİ EKRAN -->
   <div id="app-view" class="app-wrapper hidden">
-    <!-- Üst Uygulama Çubuğu -->
     <header class="app-topbar">
       <div class="brand-logo">
         <span class="paw-badge">🐾</span>
@@ -154,155 +175,317 @@
       </div>
       <div class="user-stats-pill">
         <span>🐾 <strong id="header-points">120</strong> Puan</span>
-        <span class="divider">|</span>
-        <span id="header-badge-title">Pati Gönüllüsü</span>
       </div>
     </header>
 
-    <!-- Sekme İçerikleri -->
     <main class="app-content">
-      <!-- 1. GÖREVLER SEKMESİ -->
+      <!-- 1. GÖREVLER -->
       <section id="tab-tasks" class="tab-panel active">
         <div class="panel-header">
           <h2>Bugünün İyilik Görevleri</h2>
-          <p>Fotoğraf yükleyerek görevini kanıtla, Pati Puanlarını kap!</p>
+          <p>Fotoğraf yükleyerek görevini kanıtla, puanları kap!</p>
         </div>
         <div id="tasks-list" class="cards-stack"></div>
       </section>
 
-      <!-- 2. AKIŞ (HİKAYELER) SEKMESİ -->
+      <!-- 2. AKIŞ -->
       <section id="tab-feed" class="tab-panel hidden">
         <div class="panel-header">
           <h2>Patilerin Hikâyeleri</h2>
-          <p>Topluluktan gelen son iyilik paylaşımları</p>
         </div>
-
-        <!-- Yeni Gönderi Oluşturma Kartı -->
         <div class="composer-card">
           <textarea id="post-text" rows="3" placeholder="Bugün hangi patili dostumuza dokundun? Hikâyeni yaz..."></textarea>
           <div id="post-preview-box" class="image-preview-box hidden">
             <img id="post-preview-img" src="" alt="Önizleme" />
-            <button type="button" class="remove-img-btn" onclick="clearPostImage()">✕</button>
           </div>
           <div class="composer-actions">
             <label class="photo-upload-label">
               📷 Fotoğraf ekle
               <input type="file" id="post-image-input" accept="image/*" hidden onchange="previewPostImage(event)" />
             </label>
-            <button type="button" class="btn-primary btn-sm" onclick="publishPost()">Paylaş</button>
+            <button class="btn-primary btn-sm" onclick="publishPost()">Paylaş</button>
           </div>
         </div>
-
         <div id="feed-list" class="cards-stack"></div>
       </section>
 
-      <!-- 3. DOSTLAR SEKMESİ -->
+      <!-- 3. DOSTLAR -->
       <section id="tab-friends" class="tab-panel hidden">
-        <div class="panel-header">
-          <h2>Pati Dostları</h2>
-          <p>İyilik hareketindeki diğer gönüllülerle bağlantı kur</p>
-        </div>
+        <div class="panel-header"><h2>Pati Dostları</h2></div>
         <div id="friends-list" class="cards-stack"></div>
       </section>
 
-      <!-- 4. MAĞAZA SEKMESİ -->
+      <!-- 4. MAĞAZA -->
       <section id="tab-shop" class="tab-panel hidden">
-        <div class="panel-header">
-          <h2>Pati Mağazası</h2>
-          <p>Biriktirdiğin puanlarla dijital rozetler ve mama desteği aç</p>
-        </div>
+        <div class="panel-header"><h2>Pati Mağazası</h2></div>
         <div id="shop-list" class="shop-grid"></div>
       </section>
 
-      <!-- 5. OYUN SEKMESİ -->
+      <!-- 5. OYUN -->
       <section id="tab-game" class="tab-panel hidden">
-        <div class="panel-header">
-          <h2>Pati Yakala Mini Oyunu</h2>
-          <p>Ekranda beliren patilere dokun, ekstra bonus puan kazan!</p>
-        </div>
+        <div class="panel-header"><h2>Pati Yakala</h2></div>
         <div class="game-box">
           <div class="game-info">
             <span>Skor: <strong id="game-score">0</strong></span>
             <span>Süre: <strong id="game-timer">15</strong> sn</span>
           </div>
           <div id="game-board" class="game-board">
-            <button id="start-game-btn" class="btn-primary" onclick="startMiniGame()">Oyunu Başlat</button>
+            <button class="btn-primary" onclick="startMiniGame()">Oyunu Başlat</button>
           </div>
         </div>
       </section>
 
-      <!-- 6. DESTEK SEKMESİ -->
+      <!-- 6. DESTEK -->
       <section id="tab-support" class="tab-panel hidden">
-        <div class="panel-header">
-          <h2>Acil Durum & Destek</h2>
-          <p>Yaralı veya yardıma muhtaç bir can gördüğünde hızlıca ulaş</p>
-        </div>
+        <div class="panel-header"><h2>Acil Durum & Destek</h2></div>
         <div class="cards-stack">
-          <div class="info-card">
-            <h3>📞 Belediye Veteriner İşleri (153)</h3>
-            <p>Sokak hayvanlarının acil tedavi ve kısırlaştırma talepleri için 7/24 Beyaz Masa hattını arayabilirsin.</p>
-          </div>
-          <div class="info-card">
-            <h3>🌲 Doğa Koruma ve Milli Parklar (112)</h3>
-            <p>Yaban hayvanları ve hayati tehlike arz eden durumlarda 112 Acil Çağrı Merkezi üzerinden ekip yönlendirebilirsin.</p>
-          </div>
+          <div class="item-card"><h3>📞 Belediye (153)</h3><p>Sokak hayvanları için 7/24 hattı arayabilirsin.</p></div>
         </div>
       </section>
 
-      <!-- 7. PROFİL SEKMESİ -->
+      <!-- 7. PROFİL -->
       <section id="tab-profile" class="tab-panel hidden">
         <div class="profile-hero-card">
           <div class="avatar-circle" id="profile-avatar">P</div>
           <h2 id="profile-name">Pati Gönüllüsü</h2>
-          <p id="profile-email">gonullu@patimikoru.com</p>
           <div class="profile-metrics">
-            <div class="metric">
-              <strong id="profile-points">120</strong>
-              <span>Pati Puanı</span>
-            </div>
-            <div class="metric">
-              <strong id="profile-completed">0</strong>
-              <span>Görev</span>
-            </div>
-            <div class="metric">
-              <strong id="profile-badges-count">1</strong>
-              <span>Rozet</span>
-            </div>
+            <div class="metric"><strong id="profile-points">120</strong><span>Puan</span></div>
+            <div class="metric"><strong id="profile-completed">0</strong><span>Görev</span></div>
           </div>
         </div>
-        <button class="btn-outline btn-block logout-btn" onclick="logoutUser()">Çıkış yap</button>
+        <button class="btn-outline btn-block" onclick="logoutUser()">Çıkış yap</button>
       </section>
     </main>
 
-    <!-- Alt Navigasyon Çubuğu (7 Sekme) -->
+    <!-- ALT MENÜ -->
     <nav class="bottom-nav">
-      <button class="nav-item active" data-tab="tasks" onclick="switchTab('tasks', this)">
-        <span>📋</span><small>Görevler</small>
-      </button>
-      <button class="nav-item" data-tab="feed" onclick="switchTab('feed', this)">
-        <span>🌿</span><small>Akış</small>
-      </button>
-      <button class="nav-item" data-tab="friends" onclick="switchTab('friends', this)">
-        <span>🤝</span><small>Dostlar</small>
-      </button>
-      <button class="nav-item" data-tab="shop" onclick="switchTab('shop', this)">
-        <span>🛍️</span><small>Mağaza</small>
-      </button>
-      <button class="nav-item" data-tab="game" onclick="switchTab('game', this)">
-        <span>🎮</span><small>Oyun</small>
-      </button>
-      <button class="nav-item" data-tab="support" onclick="switchTab('support', this)">
-        <span>🩺</span><small>Destek</small>
-      </button>
-      <button class="nav-item" data-tab="profile" onclick="switchTab('profile', this)">
-        <span>👤</span><small>Profil</small>
-      </button>
+      <button class="nav-item active" onclick="switchTab('tasks', this)"><span>📋</span><small>Görevler</small></button>
+      <button class="nav-item" onclick="switchTab('feed', this)"><span>🌿</span><small>Akış</small></button>
+      <button class="nav-item" onclick="switchTab('friends', this)"><span>🤝</span><small>Dostlar</small></button>
+      <button class="nav-item" onclick="switchTab('shop', this)"><span>🛍️</span><small>Mağaza</small></button>
+      <button class="nav-item" onclick="switchTab('game', this)"><span>🎮</span><small>Oyun</small></button>
+      <button class="nav-item" onclick="switchTab('support', this)"><span>🩺</span><small>Destek</small></button>
+      <button class="nav-item" onclick="switchTab('profile', this)"><span>👤</span><small>Profil</small></button>
     </nav>
   </div>
 
-  <!-- Bildirim Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="script.js"></script>
+  <!-- JAVASCRIPT KODLARI BURADA -->
+  <script>
+    let currentUser = null;
+    let userPoints = 120;
+    let userCompletedCount = 0;
+
+    const tasksData = [
+      { id: 1, title: 'Bir Kap Su Koy', desc: 'Sokaktaki canlar için kapı önüne taze su bırak.', points: 30, completed: false, image: '68216.jpg' },
+      { id: 2, title: 'Mama Desteği Sağla', desc: 'Kediler ve köpekler için mama bırak.', points: 50, completed: false, image: '68218.jpg' }
+    ];
+
+    let feedData = [
+      { id: 1, author: 'PatiDostu', text: 'Her sevgi bir yuva! Bugün dostlarımızı besledik.', image: '68217.jpg', likes: 14, liked: false }
+    ];
+
+    const friendsData = [
+      { name: 'Zeynep Kaya', points: 340, badge: 'Pati Muhafızı' },
+      { name: 'Mehmet Demir', points: 210, badge: 'Sokak Kahramanı' }
+    ];
+
+    const shopData = [
+      { id: 1, title: 'Altın Pati Rozeti', desc: 'Profilinde sergile', cost: 100, icon: '🏅' },
+      { id: 2, title: 'Mama Bağışı', desc: 'Barınağa mama desteği', cost: 150, icon: '🥣' }
+    ];
+
+    function openAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+    function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+
+    function handleAuthSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById('auth-name').value.trim();
+      if (!name) return;
+      currentUser = { name };
+      document.getElementById('profile-name').innerText = currentUser.name;
+      document.getElementById('profile-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
+      showToast('Hoş geldin, ' + currentUser.name + '! 🐾');
+      showApp();
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      showToast('Çıkış yapıldı.');
+      showLanding();
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+      document.querySelectorAll('.bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function renderTasks() {
+      const container = document.getElementById('tasks-list');
+      container.innerHTML = '';
+      tasksData.forEach(task => {
+        container.innerHTML += `
+          <div class="item-card">
+            <div class="item-card-header">
+              <div>
+                <div class="item-card-title">${task.title}</div>
+                <div class="item-card-desc">${task.desc}</div>
+              </div>
+              <span class="reward-badge">+${task.points} Puan</span>
+            </div>
+            ${task.image ? `<div class="image-preview-box"><img src="${task.image}" /></div>` : ''}
+            <button class="btn-primary btn-sm btn-block" ${task.completed ? 'disabled style="opacity:0.6"' : ''} onclick="completeTask(${task.id})">
+              ${task.completed ? 'Tamamlandı ✓' : 'Görevi Tamamla'}
+            </button>
+          </div>`;
+      });
+    }
+
+    function completeTask(taskId) {
+      const task = tasksData.find(t => t.id === taskId);
+      if (task && !task.completed) {
+        task.completed = true;
+        userPoints += task.points;
+        userCompletedCount++;
+        updateStats();
+        renderTasks();
+        showToast(`Tebrikler! +${task.points} Puan kazandın 🎉`);
+      }
+    }
+
+    let currentPostImageBase64 = null;
+    function previewPostImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          currentPostImageBase64 = e.target.result;
+          document.getElementById('post-preview-img').src = currentPostImageBase64;
+          document.getElementById('post-preview-box').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function publishPost() {
+      const text = document.getElementById('post-text').value.trim();
+      if (!text && !currentPostImageBase64) return;
+      feedData.unshift({ id: Date.now(), author: currentUser.name, text, image: currentPostImageBase64, likes: 0, liked: false });
+      document.getElementById('post-text').value = '';
+      document.getElementById('post-preview-box').classList.add('hidden');
+      currentPostImageBase64 = null;
+      renderFeed();
+      showToast('Hikâyen paylaşıldı! 🌿');
+    }
+
+    function renderFeed() {
+      const container = document.getElementById('feed-list');
+      container.innerHTML = '';
+      feedData.forEach(post => {
+        container.innerHTML += `
+          <div class="item-card">
+            <strong>${post.author}</strong>
+            ${post.text ? `<p class="item-card-desc" style="margin-top:6px">${post.text}</p>` : ''}
+            ${post.image ? `<div class="image-preview-box"><img src="${post.image}" /></div>` : ''}
+            <button onclick="likePost(${post.id})" style="color:var(--accent); font-weight:600; margin-top:8px">🧡 ${post.likes} Beğeni</button>
+          </div>`;
+      });
+    }
+
+    function likePost(id) {
+      const p = feedData.find(x => x.id === id);
+      if (p) { p.liked = !p.liked; p.liked ? p.likes++ : p.likes--; renderFeed(); }
+    }
+
+    function renderFriends() {
+      const container = document.getElementById('friends-list');
+      container.innerHTML = '';
+      friendsData.forEach(f => {
+        container.innerHTML += `<div class="item-card" style="display:flex; justify-content:space-between; align-items:center;"><strong>${f.name}</strong><span class="reward-badge">🐾 ${f.points} Puan</span></div>`;
+      });
+    }
+
+    function renderShop() {
+      const container = document.getElementById('shop-list');
+      container.innerHTML = '';
+      shopData.forEach(s => {
+        container.innerHTML += `<div class="shop-card"><span class="shop-icon">${s.icon}</span><h3>${s.title}</h3><p>${s.desc}</p><button class="btn-primary btn-sm btn-block" onclick="buyItem(${s.cost})">${s.cost} Puan</button></div>`;
+      });
+    }
+
+    function buyItem(cost) {
+      if (userPoints >= cost) {
+        userPoints -= cost;
+        updateStats();
+        showToast('Başarıyla alındı! 🎁');
+      } else {
+        showToast('Yeterli puanın yok!');
+      }
+    }
+
+    let gameInterval, gameTimerInterval, gameScore, timeLeft, isGamePlaying = false;
+    function startMiniGame() {
+      const board = document.getElementById('game-board');
+      board.innerHTML = '';
+      gameScore = 0; timeLeft = 15; isGamePlaying = true;
+      document.getElementById('game-score').innerText = gameScore;
+      document.getElementById('game-timer').innerText = timeLeft;
+      gameTimerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('game-timer').innerText = timeLeft;
+        if (timeLeft <= 0) endMiniGame();
+      }, 1000);
+      spawnPaw();
+      gameInterval = setInterval(spawnPaw, 900);
+    }
+
+    function spawnPaw() {
+      if (!isGamePlaying) return;
+      const board = document.getElementById('game-board');
+      const old = document.getElementById('paw'); if (old) old.remove();
+      const paw = document.createElement('button');
+      paw.id = 'paw'; paw.className = 'target-paw'; paw.innerHTML = '🐾';
+      paw.style.left = Math.floor(Math.random() * (board.clientWidth - 50)) + 'px';
+      paw.style.top = Math.floor(Math.random() * (board.clientHeight - 50)) + 'px';
+      paw.onclick = () => { gameScore += 10; document.getElementById('game-score').innerText = gameScore; paw.remove(); };
+      board.appendChild(paw);
+    }
+
+    function endMiniGame() {
+      isGamePlaying = false;
+      clearInterval(gameInterval); clearInterval(gameTimerInterval);
+      userPoints += gameScore;
+      updateStats();
+      document.getElementById('game-board').innerHTML = `<h3>Oyun Bitti! Kazanılan: +${gameScore} Puan</h3><button class="btn-primary" onclick="startMiniGame()">Tekrar Oyna</button>`;
+      showToast(`+${gameScore} Puan kazandın! 🎮`);
+    }
+
+    function updateStats() {
+      document.getElementById('header-points').innerText = userPoints;
+      document.getElementById('profile-points').innerText = userPoints;
+      document.getElementById('profile-completed').innerText = userCompletedCount;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg; t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 3000);
+    }
+
+    function showLanding() {
+      document.getElementById('landing-view').classList.remove('hidden');
+      document.getElementById('app-view').classList.add('hidden');
+    }
+
+    function showApp() {
+      document.getElementById('landing-view').classList.add('hidden');
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('app-view').classList.remove('hidden');
+      renderTasks(); renderFeed(); renderFriends(); renderShop(); updateStats();
+    }
+  </script>
 </body>
 </html>
