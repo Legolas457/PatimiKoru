@@ -173,4 +173,259 @@ function handleTaskImage(event, taskId) {
   if (file) {
     const reader = new FileReader();
     reader.onload = function(e) {
-      const task
+      const task = tasksData.find(t => t.id === taskId);
+      if (task) {
+        task.image = e.target.result;
+        renderTasks();
+        showToast('Kanıt fotoğrafı eklendi!');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function completeTask(taskId) {
+  const task = tasksData.find(t => t.id === taskId);
+  if (task && !task.completed) {
+    task.completed = true;
+    userPoints += task.points;
+    userCompletedCount++;
+    updateHeaderStats();
+    renderTasks();
+    showToast(`Tebrikler! +${task.points} Pati Puanı kazandın 🎉`);
+  }
+}
+
+// --- AKIŞ (HİKAYELER) SEKMESİ ---
+function previewPostImage(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      currentPostImageBase64 = e.target.result;
+      const previewBox = document.getElementById('post-preview-box');
+      const previewImg = document.getElementById('post-preview-img');
+      previewImg.src = currentPostImageBase64;
+      previewBox.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function clearPostImage() {
+  currentPostImageBase64 = null;
+  document.getElementById('post-preview-box').classList.add('hidden');
+  document.getElementById('post-image-input').value = '';
+}
+
+function publishPost() {
+  const text = document.getElementById('post-text').value.trim();
+  if (!text && !currentPostImageBase64) {
+    showToast('Lütfen bir metin veya fotoğraf ekleyin.');
+    return;
+  }
+
+  const newPost = {
+    id: Date.now(),
+    author: currentUser ? currentUser.name : 'PatiGönüllüsü',
+    text: text,
+    image: currentPostImageBase64,
+    likes: 0,
+    liked: false
+  };
+
+  feedData.unshift(newPost);
+  document.getElementById('post-text').value = '';
+  clearPostImage();
+  renderFeed();
+  showToast('Hikâyen toplulukla paylaşıldı! 🌿');
+}
+
+function renderFeed() {
+  const container = document.getElementById('feed-list');
+  container.innerHTML = '';
+
+  feedData.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <div class="avatar-circle" style="width:32px; height:32px; font-size:0.9rem; margin:0;">${post.author.charAt(0).toUpperCase()}</div>
+        <strong>${post.author}</strong>
+      </div>
+      ${post.text ? `<p class="item-card-desc">${post.text}</p>` : ''}
+      ${post.image ? `
+        <div class="image-preview-box" style="margin-bottom: 12px;">
+          <img src="${post.image}" alt="Gönderi Görseli" />
+        </div>
+      ` : ''}
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; color:var(--text-muted); border-top:1px solid var(--border-color); pt:8px; margin-top:8px;">
+        <button onclick="likePost(${post.id})" style="background:none; border:none; cursor:pointer; color:${post.liked ? 'var(--accent)' : 'var(--text-muted)'}; font-weight:600;">
+          🧡 ${post.likes} Beğeni
+        </button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function likePost(postId) {
+  const post = feedData.find(p => p.id === postId);
+  if (post) {
+    if (post.liked) {
+      post.likes--;
+      post.liked = false;
+    } else {
+      post.likes++;
+      post.liked = true;
+    }
+    renderFeed();
+  }
+}
+
+// --- DOSTLAR SEKMESİ ---
+function renderFriends() {
+  const container = document.getElementById('friends-list');
+  container.innerHTML = '';
+
+  friendsData.forEach(friend => {
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.style.display = 'flex';
+    card.style.justify0content = 'space-between';
+    card.style.alignItems = 'center';
+    card.innerHTML = `
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="avatar-circle" style="width:40px; height:40px; font-size:1.1rem; margin:0;">${friend.name.charAt(0)}</div>
+        <div>
+          <strong style="display:block; color:var(--primary); font-size:0.95rem;">${friend.name}</strong>
+          <small style="color:var(--text-muted);">${friend.badge}</small>
+        </div>
+      </div>
+      <span class="reward-badge">🐾 ${friend.points} Puan</span>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// --- MAĞAZA SEKMESİ ---
+function renderShop() {
+  const container = document.getElementById('shop-list');
+  container.innerHTML = '';
+
+  shopData.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'shop-card';
+    card.innerHTML = `
+      <span class="shop-icon">${item.icon}</span>
+      <h3>${item.title}</h3>
+      <p>${item.desc}</p>
+      <button class="btn-primary btn-sm btn-block" onclick="buyShopItem(${item.cost}, '${item.title}')">${item.cost} Puan</button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function buyShopItem(cost, title) {
+  if (userPoints >= cost) {
+    userPoints -= cost;
+    updateHeaderStats();
+    showToast(`Tebrikler! "${title}" başarıyla alındı 🎁`);
+  } else {
+    showToast('Yeterli Pati Puanın bulunmuyor. Görevleri tamamlayarak puan kazanabilirsin!');
+  }
+}
+
+// --- MİNİ OYUN (PATİ YAKALA) ---
+let gameInterval = null;
+let gameTimerInterval = null;
+let gameScore = 0;
+let timeLeft = 15;
+let isGamePlaying = false;
+
+function startMiniGame() {
+  const board = document.getElementById('game-board');
+  board.innerHTML = '';
+  gameScore = 0;
+  timeLeft = 15;
+  isGamePlaying = true;
+  document.getElementById('game-score').innerText = gameScore;
+  document.getElementById('game-timer').innerText = timeLeft;
+
+  gameTimerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('game-timer').innerText = timeLeft;
+    if (timeLeft <= 0) {
+      endMiniGame();
+    }
+  }, 1000);
+
+  spawnTargetPaw();
+  gameInterval = setInterval(spawnTargetPaw, 900);
+}
+
+function spawnTargetPaw() {
+  if (!isGamePlaying) return;
+  const board = document.getElementById('game-board');
+  
+  // Önceki patiyi temizle
+  const oldPaw = document.getElementById('active-paw');
+  if (oldPaw) oldPaw.remove();
+
+  const paw = document.createElement('button');
+  paw.id = 'active-paw';
+  paw.className = 'target-paw';
+  paw.innerHTML = '🐾';
+  
+  const maxX = board.clientWidth - 50;
+  const maxY = board.clientHeight - 50;
+  const randomX = Math.floor(Math.random() * Math.max(10, maxX));
+  const randomY = Math.floor(Math.random() * Math.max(10, maxY));
+
+  paw.style.left = randomX + 'px';
+  paw.style.top = randomY + 'px';
+
+  paw.onclick = () => {
+    gameScore += 10;
+    document.getElementById('game-score').innerText = gameScore;
+    paw.remove();
+  };
+
+  board.appendChild(paw);
+}
+
+function endMiniGame() {
+  isGamePlaying = false;
+  clearInterval(gameInterval);
+  clearInterval(gameTimerInterval);
+
+  const board = document.getElementById('game-board');
+  const earnedBonus = gameScore;
+  userPoints += earnedBonus;
+  updateHeaderStats();
+
+  board.innerHTML = `
+    <div style="text-align:center;">
+      <h3 style="font-family:'Fraunces',serif; color:var(--primary); margin-bottom:8px;">Oyun Bitti!</h3>
+      <p style="color:var(--text-muted); margin-bottom:14px;">Toplam Skor: <strong>${gameScore}</strong><br>Kazanılan Bonus: <strong>+${earnedBonus} Puan</strong></p>
+      <button class="btn-primary" onclick="startMiniGame()">Tekrar Oyna</button>
+    </div>
+  `;
+  showToast(`Tebrikler! Oyundan +${earnedBonus} Pati Puanı kazandın 🎮`);
+}
+
+// --- YARDIMCI / İSTATİSTİK GÜNCELLEME ---
+function updateHeaderStats() {
+  document.getElementById('header-points').innerText = userPoints;
+  document.getElementById('profile-points').innerText = userPoints;
+  document.getElementById('profile-completed').innerText = userCompletedCount;
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.innerText = message;
+  toast.classList.remove('hidden');
+  setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 3000);
+}
